@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32819.101
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "S3-SimpleBackup", "S3-SimpleBackup.csproj", "{3FDDD0CE-33F0-426B-8ECA-82D6197F3ADD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3FDDD0CE-33F0-426B-8ECA-82D6197F3ADD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FDDD0CE-33F0-426B-8ECA-82D6197F3ADD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FDDD0CE-33F0-426B-8ECA-82D6197F3ADD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FDDD0CE-33F0-426B-8ECA-82D6197F3ADD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {54394CF5-7A3A-4A5B-BA0E-A9F244DF1EB0}
+	EndGlobalSection
+EndGlobal

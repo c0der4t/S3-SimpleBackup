@@ -1,0 +1,110 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"
+        x:Class="S3_SimpleBackup.MainWindow"
+        Title="S3_SimpleBackup"
+        Width="850" Height="600"
+        x:Name="frmMain">
+
+  <Grid>
+
+    <Grid.RowDefinitions>
+      <RowDefinition Height="2"/>
+      <RowDefinition Height="auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="2"/>
+    </Grid.RowDefinitions>
+
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="2"/>
+      <ColumnDefinition Width="*"/>
+      <ColumnDefinition Width="2"/>
+    </Grid.ColumnDefinitions>
+
+    <TabStrip x:Name="tabstrpNavigation" Grid.Row="1" Grid.Column="1">
+      
+      <TabStripItem Content="Output"/>
+      <TabStripItem Content="Jobs"/>
+      <TabStripItem Content="Settings"/>
+      <TabStripItem Content="Help"/>
+      <TabStripItem Content="Developer"/>
+
+    </TabStrip>
+
+    
+    <TabControl x:Name="tbctrlMainPage"
+                Grid.Row="2" Grid.Column="1"
+                SelectedIndex="{Binding #tabstrpNavigation.SelectedIndex}">
+     
+      <TabItem x:Name="tabOutput">
+        <TextBlock Text="Welcome to S3-SimpleBackup!"/>
+      </TabItem>
+
+      <TabItem x:Name="tabJobs">
+        <TextBlock Text="Ready to set up some jobs?"/>
+      </TabItem>
+
+      <TabItem x:Name="tabSettings">
+        <TextBlock Text="Let's get personal"/>
+      </TabItem>
+      
+      <TabItem x:Name="tabHelp">
+        <TextBlock Text="This sections is still under construction"/>
+      </TabItem>
+
+      <TabItem x:Name="tabDev">
+        <Grid>
+
+          <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+          </Grid.RowDefinitions>
+
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+
+          <TextBlock Grid.Row="0" 
+                     Text="WARNING!&#x0a;This section is used during development.&#x0a;Do not use touch this section!"/>
+
+          <StackPanel Orientation="Vertical" Spacing="10" Grid.Row="1" >
+
+            <Button x:Name="dev_btnTestMsgBox" Content="Test Custom MessageBox" Click="dev_btnTestMsgBox_Clicked"/>
+            <Panel Background="WhiteSmoke" >
+
+              <StackPanel  Orientation="Vertical" Spacing="10" Margin="10,10,10,10">
+
+                <TextBlock Text="S3 Account Setup" Margin="8,8,8,8"/>
+                <TextBox x:Name="dev_edtS3Host" Watermark="S3 Host/REST Endpoint"/>
+                <TextBox x:Name="dev_edtAccessKeyID" Watermark="Access Key ID" />
+                <TextBox x:Name="dev_edtSecretAccessKey"
+                          Watermark="Secret Access Key"
+                          PasswordChar="*"/>
+                <TextBox x:Name="dev_edtBucketName" Watermark="Bucket Name" />
+
+
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                  <Button x:Name="dev_btnTestConnection" Content="Test Connection" Click="dev_btnTestConnection_Clicked"/>
+                  <Button x:Name="dev_btnUploadTestFile" Content="Upload Test File" Click="dev_btnUploadTestFile_Clicked"/>
+                </StackPanel>
+
+              </StackPanel>
+
+            </Panel>
+            
+          </StackPanel>
+          
+         
+          
+        </Grid>
+      </TabItem>
+
+    </TabControl>
+
+    
+
+  </Grid>
+
+</Window>
