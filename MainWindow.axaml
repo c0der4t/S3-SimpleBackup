@@ -39,7 +39,12 @@
                 SelectedIndex="{Binding #tabstrpNavigation.SelectedIndex}">
      
       <TabItem x:Name="tabOutput">
-        <TextBlock Text="Welcome to S3-SimpleBackup!"/>
+        <StackPanel>
+          <TextBlock Text="Welcome to S3-SimpleBackup!"/>
+          <TextBox x:Name="edtLogOutput" TextWrapping="Wrap"
+                   AcceptsReturn="True"/>
+          
+        </StackPanel>
       </TabItem>
 
       <TabItem x:Name="tabJobs">

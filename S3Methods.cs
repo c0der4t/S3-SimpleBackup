@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -8,30 +9,38 @@ using System.Threading.Tasks;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
+using SharedMethods;
 
 namespace S3_SimpleBackup
 {
     public class S3Methods
     {
 
+        public IAmazonS3 GenerateS3Client(string s3Host, string s3AccessKey, string s3SecureKey)
+        {
+            var config = new AmazonS3Config { ServiceURL = s3Host };
+            var s3Credentials = new BasicAWSCredentials(s3AccessKey, s3SecureKey);
+            return new AmazonS3Client(s3Credentials, config);
+        }
+
         /// <summary>
-        /// Lists the objects in a S3 bucket.
+        /// Attempts to list the contents of a given bucket
+        /// Once connection opens, success is assumed
         /// </summary>
-        /// <param name="_s3Client">An initialized Amazon S3 client object.</param>
-        /// <param name="bucketName">The name of the bucket for which to list
-        /// the contents.</param>
-        /// <returns>A boolean value indicating the success or failure of the
-        /// copy operation.</returns>
+        /// <param name="s3Host">An S3 host/REST URL. Must include https://</param>
+        /// <param name="s3AccessKey">The access / user key for S3 host</param>
+        /// <param name="s3SecureKey">The secret key for the S3 host</param>
+        /// <param name="bucketToTarget">The full name of the bucket to target</param>
+        /// <returns></returns>
         public async Task<bool> Test_ListBucketContentsAsync(string s3Host, string s3AccessKey, string s3SecureKey, string bucketToTarget)
         {
             try
             {
-                IAmazonS3 _s3Client;
-                var config = new AmazonS3Config { ServiceURL = s3Host };
-                var s3Credentials = new BasicAWSCredentials(s3AccessKey, s3SecureKey);
-                _s3Client = new AmazonS3Client(s3Credentials, config);
+                IAmazonS3 _s3Client = GenerateS3Client(s3Host, s3AccessKey, s3SecureKey);
 
-                var request = new ListObjectsV2Request
+                 var request = new ListObjectsV2Request
                 {
                     BucketName = bucketToTarget,
                     MaxKeys = 1,
@@ -42,9 +51,9 @@ namespace S3_SimpleBackup
                 response = await _s3Client.ListObjectsV2Async(request);
                 return true;
 
-             
 
-                
+
+
             }
             catch (AmazonS3Exception ex)
             {
@@ -53,6 +62,55 @@ namespace S3_SimpleBackup
             }
         }
 
+
+        /// <summary>
+        /// Uploads a given file to the given bucket
+        /// </summary>
+        /// <param name="s3Host">An S3 host/REST URL. Must include https://</param>
+        /// <param name="s3AccessKey">The access / user key for S3 host</param>
+        /// <param name="s3SecureKey">The secret key for the S3 host</param>
+        /// <param name="bucketToTarget">The full name of the bucket to target</param>
+        /// <param name="itemToUploadPath">Full path to single file to upload</param>
+        /// <returns></returns>
+        public async Task<bool> Test_UploadTestFile(string s3Host, string s3AccessKey, string s3SecureKey, string bucketToTarget,string itemToUploadPath, Window parentWindow)
+        {
+            try
+            {
+                Output.WriteToUI($"[TEST] Spawning S3Client", parentWindow);
+                IAmazonS3 _s3Client = GenerateS3Client(s3Host, s3AccessKey, s3SecureKey);
+
+
+
+                var putRequest = new PutObjectRequest
+                {
+                    BucketName = bucketToTarget,
+                    Key = System.IO.Path.GetFileName(itemToUploadPath),
+                    FilePath = itemToUploadPath
+
+                };
+
+                Output.WriteToUI($"[TEST] Target Bucket: {bucketToTarget}", parentWindow);
+                Output.WriteToUI($"[TEST] File to upload: {itemToUploadPath}", parentWindow);
+                Output.WriteToUI($"[TEST] Remote file name: {System.IO.Path.GetFileName(itemToUploadPath)}", parentWindow);
+
+                putRequest.Metadata.Add("x-amz-meta-title", "FileUploadTest");
+
+                Output.WriteToUI($"[TEST] Uploading file: {itemToUploadPath}", parentWindow);
+
+                await _s3Client.PutObjectAsync(putRequest);
+
+                Output.WriteToUI($"[TEST] Uploaded File: {itemToUploadPath}", parentWindow);
+
+                return true;
+
+            }
+            catch (AmazonS3Exception e)
+            {
+                Output.WriteToUI($"[TEST] Error during upload: {e.Message}", parentWindow);
+                Output.WriteToUI($"[TEST] Please check S3 setup and try again: {e.Message}", parentWindow);
+                return false;
+            }
+        }
     }
 
 }
