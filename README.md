@@ -2,11 +2,12 @@
 ### ⤴ A simple S3 storage backup app
 
 ## Note, this app is non-functional!
-Current packages only include the expored Developer tab to show functionality
+Current packages only include the exposed Developer tab to show functionality
 
 ## 👀 Current state
 
 You can add your S3 account details
+
 Note that the application will currently only traverse the root of a bucket.
 
 Once account info has been added, you can do a simple connection test OR upload 1 test file
