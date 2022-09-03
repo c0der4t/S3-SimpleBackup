@@ -13,7 +13,6 @@ namespace S3_SimpleBackup
         public MainWindow()
         {
             InitializeComponent();
-            Debug.WriteLine(Path.Combine(Directory.GetCurrentDirectory(), "devinfo.txt"));
 
             //Check if dev keys exist. If so load them into th dev tab
             if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(),"devinfo.txt")))
