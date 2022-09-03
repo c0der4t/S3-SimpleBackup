@@ -1,4 +1,4 @@
-# CodePath
+#  S3-SimpleBackup
 ### ⤴ A simple S3 storage backup app
 
 ## Note, this app is non-functional!
