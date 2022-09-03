@@ -24,7 +24,7 @@
     </Grid.ColumnDefinitions>
 
     <TabStrip x:Name="tabstrpNavigation" Grid.Row="1" Grid.Column="1">
-      
+
       <TabStripItem Content="Output"/>
       <TabStripItem Content="Jobs"/>
       <TabStripItem Content="Settings"/>
@@ -33,28 +33,51 @@
 
     </TabStrip>
 
-    
+
     <TabControl x:Name="tbctrlMainPage"
                 Grid.Row="2" Grid.Column="1"
                 SelectedIndex="{Binding #tabstrpNavigation.SelectedIndex}">
-     
+
       <TabItem x:Name="tabOutput">
         <StackPanel>
           <TextBlock Text="Welcome to S3-SimpleBackup!"/>
+
+          <StackPanel x:Name="spnlActiveJobs" >
+
+          </StackPanel>
+
           <TextBox x:Name="edtLogOutput" TextWrapping="Wrap"
                    AcceptsReturn="True"/>
-          
+
         </StackPanel>
       </TabItem>
 
       <TabItem x:Name="tabJobs">
-        <TextBlock Text="Ready to set up some jobs?"/>
+        <StackPanel Orientation="Vertical" Spacing="10">
+
+
+
+          <TextBlock Text="Manage backup jobs:"/>
+
+          <StackPanel x:Name="spnlJobsButtons" Orientation="Horizontal" Spacing="5">
+            <Button x:Name="btnRunJob" Content="Run Selected Job" Margin="5,5,5,5"/>
+            <Button x:Name="btnRunAllJob" Content="Run All Jobs" Margin="5,5,5,5"/>
+            <Button x:Name="btnNewJob" Content="Setup New Job" Margin="5,5,5,5"/>
+            <Button x:Name="btnEditJob" Content="Edit Job" Margin="5,5,5,5"/>
+            <Button x:Name="btnDeleteJob" Content="Delete Job" Margin="5,5,5,5"/>
+          </StackPanel>
+
+          <DataGrid x:Name="dbgJobsList" CanUserReorderColumns="False"
+                    IsReadOnly="True" HorizontalScrollBarVisibility="Hidden"
+                    />
+
+        </StackPanel>
       </TabItem>
 
       <TabItem x:Name="tabSettings">
         <TextBlock Text="Let's get personal"/>
       </TabItem>
-      
+
       <TabItem x:Name="tabHelp">
         <TextBlock Text="This sections is still under construction"/>
       </TabItem>
@@ -71,7 +94,7 @@
             <ColumnDefinition Width="*"/>
           </Grid.ColumnDefinitions>
 
-          <TextBlock Grid.Row="0" 
+          <TextBlock Grid.Row="0"
                      Text="WARNING!&#x0a;This section is used during development.&#x0a;Do not use touch this section!"/>
 
           <StackPanel Orientation="Vertical" Spacing="10" Grid.Row="1" >
@@ -98,17 +121,17 @@
               </StackPanel>
 
             </Panel>
-            
+
           </StackPanel>
-          
-         
-          
+
+
+
         </Grid>
       </TabItem>
 
     </TabControl>
 
-    
+
 
   </Grid>
 
