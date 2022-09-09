@@ -129,3 +129,5 @@ C:\Users\monte\Dev\S3-SimpleBackup\obj\Debug\net6.0\S3-SimpleBackup.genruntimeco
 C:\Users\monte\Dev\S3-SimpleBackup\obj\Debug\net6.0\ref\S3-SimpleBackup.dll
 C:\Users\monte\Dev\S3-SimpleBackup\bin\Debug\net6.0\AWSSDK.Core.dll
 C:\Users\monte\Dev\S3-SimpleBackup\bin\Debug\net6.0\AWSSDK.S3.dll
+C:\Users\monte\Dev\S3-SimpleBackup\bin\Debug\net6.0\System.Security.Cryptography.ProtectedData.dll
+C:\Users\monte\Dev\S3-SimpleBackup\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll

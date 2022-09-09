@@ -10,6 +10,8 @@ using static System.Reflection.Metadata.BlobBuilder;
 using System.Collections;
 using System.Threading.Tasks;
 using System;
+using System.Diagnostics;
+using DataProtection;
 
 namespace S3_SimpleBackup
 {
@@ -59,7 +61,7 @@ namespace S3_SimpleBackup
         private async void dev_btnTestConnection_Clicked(object? sender, RoutedEventArgs args)
         {
             dev_btnTestConnection.Content = "Testing Connection...";
-            bool ConnectionSuccess = await s3Methods.Test_ListBucketContentsAsync(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, dev_edtSecretAccessKey.Text, dev_edtBucketName.Text);
+            bool ConnectionSuccess = await s3Methods.Test_BucketConnectionAsync(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), dev_edtBucketName.Text);
 
             dev_btnTestConnection.Content = "Test Connection";
 
@@ -84,7 +86,7 @@ namespace S3_SimpleBackup
 
             if (outPathStrings != null)
             {
-                UploadSuccess = await s3Methods.Test_UploadTestFile(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, dev_edtSecretAccessKey.Text, dev_edtBucketName.Text, outPathStrings[0], this);
+                UploadSuccess = await s3Methods.Test_UploadTestFile(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), dev_edtBucketName.Text, outPathStrings[0], this);
 
             }
 
@@ -106,6 +108,26 @@ namespace S3_SimpleBackup
         private async void dev_btnTestMsgBox_Clicked(object? sender, RoutedEventArgs args)
         {
             await MessageBox.Show(this, "This is a custom messagebox test\nThis is a second line", "Test MessageBox", MessageBox.MessageBoxButtons.Ok);
+
+        }
+
+        private async void dev_btnTestEncrytion_Clicked(object? sender, RoutedEventArgs args)
+        {
+            string unEncryptedString = "This is a test string";
+            await MessageBox.Show(this, $"String to encrypt \n{unEncryptedString}", "", MessageBox.MessageBoxButtons.Ok);
+            await MessageBox.Show(this, $"Encrypted String \n{UnProtect.ConvertToInsecureString(Protect.EncryptString(unEncryptedString))}", "", MessageBox.MessageBoxButtons.Ok);
+            
+        }
+
+        private async void dev_btnListRemoteRoot_Clicked(object? sender, RoutedEventArgs args)
+        {
+           Task<bool> result = s3Methods.Test_ListBucketContentsAsync(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), dev_edtBucketName.Text);
+        }
+
+        private void btnEditjob_Clicked(object? sender, RoutedEventArgs args)
+        {
+            JobManager jobManagerWindow = new JobManager("edit", _Jobs[dbgJobsList.SelectedIndex]);
+            jobManagerWindow.ShowDialog(this);
 
         }
 

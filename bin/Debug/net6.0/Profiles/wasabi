@@ -1,3 +1,5 @@
 # This is a comment test
-Test1,c:\temp\pings.txt,/
-Test2,C:\Users\monte\Dev,/monte/dev
+#Field Format:
+#JobName,SourceFileFolder,S3Destination,JobParameterString,isJobEnabled
+Test1,c:\temp\pings.txt,/,,true
+Test2,C:\Users\monte\Dev,/monte/dev,anhb,false

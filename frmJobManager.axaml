@@ -1,0 +1,102 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="S3_SimpleBackup.JobManager"
+        Title="Job Manager" x:Name="frmJobManager" Activated="frmJobManager_Activated"
+        Width="500" Height="300">
+
+  <Grid>
+
+    <Grid.RowDefinitions>
+      <RowDefinition Height="10"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="10"/>
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="10"/>
+      <ColumnDefinition Width="*"/>
+      <ColumnDefinition Width="10"/>
+    </Grid.ColumnDefinitions>
+
+    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" Spacing="10">
+      <StackPanel Orientation="Horizontal" Spacing="5">
+        
+      </StackPanel>
+
+      <Grid x:Name="grdProfileSelector">
+
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+
+        <ComboBox x:Name="cmbxProfileSelector"
+                 Grid.Row="0" Grid.Column="0" PlaceholderText="Assign Job to a Profile"/>
+        <Button Content="Manage Profiles" 
+                Grid.Row="0" Grid.Column="1"/>
+        
+      </Grid>
+      
+      <TextBox x:Name="edtJobName" />
+
+      <Grid x:Name="grdSourceFiles">
+
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBox x:Name="edtSource" Grid.Row="0"
+                 Grid.Column="0"/>
+        <Button Content="..." Grid.Row="0"
+                 Grid.Column="1"/>
+
+      </Grid>
+     
+      <Grid x:Name="grdDestinationFiles">
+
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBox x:Name="edtDestination" Grid.Row="0"
+                 Grid.Column="0"/>
+        <Button Content="..." Grid.Row="0"
+                 Grid.Column="1"/>
+
+      </Grid>
+
+      <StackPanel x:Name="spnlJobParameters" Orientation="Vertical">
+        <TextBlock Text="Job Parameters"/>
+        <StackPanel Orientation="Horizontal"
+                    Spacing="5" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+          <CheckBox Content="Sync Source to Destination"/>
+          <RadioButton Content="Test1"/>
+          <RadioButton Content="Test2"/>
+        </StackPanel>
+      </StackPanel>
+
+      <CheckBox x:Name="chkbxJobEnabled" Content="Enable Job (runs when profile runs)"/>
+
+    </StackPanel>
+
+
+  </Grid>
+
+
+</Window>

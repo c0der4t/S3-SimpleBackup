@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics.Metrics;
 using System.IO;
 using System.Linq;
+using System.Runtime;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -44,7 +45,7 @@ namespace SharedMethods
                     //Send the job line to the job parser method
                     //Expect a BackupJobModel back
                     string profileName = Path.GetFileNameWithoutExtension(currentJobFile);
-                    Output.WriteToUI($"Loading profile: {profileName}",parentWindow);
+                    Output.WriteToUI($"Loading profile: {profileName}", parentWindow);
 
                     foreach (string currLine in System.IO.File.ReadLines(currentJobFile))
                     {
@@ -63,7 +64,6 @@ namespace SharedMethods
 
             return _Jobs;
         }
-
 
         public static BackupJobModel ParseJobItem(string ProfileName, string rawJobItem, Window parentWindow)
         {
@@ -95,22 +95,25 @@ namespace SharedMethods
                     switch (colNumber)
                     {
                         case 1:
-                            jobName = currColValue;
+                            jobItem.JobName = currColValue;
                             break;
                         case 2:
-                            sourceFileFolder = currColValue;
+                            jobItem.SourceFileFolder = currColValue;
                             break;
                         case 3:
-                            s3Destination = currColValue;
+                            jobItem.S3Destination = currColValue;
+                            break;
+                        case 4:
+                            jobItem.JobParameters = currColValue;
+                            break;
+                        case 5:
+                            jobItem.JobEnabled = currColValue.ToLower() == "true" ? true : false;
                             break;
                         default:
                             break;
                     }
                 }
 
-                jobItem.JobName = jobName;
-                jobItem.SourceFileFolder = sourceFileFolder;
-                jobItem.S3Destination = s3Destination;
                 Output.WriteToUI($"Loaded job: {jobName}", parentWindow);
                 return jobItem;
             }
@@ -120,6 +123,44 @@ namespace SharedMethods
             }
         }
 
+        public static void CreateNewProfile(string ProfileStorageLocation, string ProfileName)
+        {
+            //Redundant on purpose: Create profile file
+            if (!File.Exists(Path.Combine(ProfileStorageLocation, ProfileName)))
+            {
+                File.Create(Path.Combine(ProfileStorageLocation, ProfileName));
+
+                //Add default comments to the file
+                using (StreamWriter newProfileFile = new StreamWriter(Path.Combine(ProfileStorageLocation, ProfileName)))
+                {
+                    newProfileFile.WriteLine("#This is a Simple S3 profile file");
+                    newProfileFile.WriteLine("#Fields starting with # are considered comments");
+                    newProfileFile.WriteLine("#Field Format:");
+                    newProfileFile.WriteLine("#JobName,SourceFileFolder,S3Destination,JobParameterString,isJobEnabled");
+                }
+
+            }
+
+        }
+
+        public static bool CreateNewJob(string ProfileStorageLocation, BackupJobModel jobInfo)
+        {
+            //Check if profile exists
+            if (!Directory.Exists(ProfileStorageLocation))
+            {
+                Directory.CreateDirectory(ProfileStorageLocation);
+            }
+
+            CreateNewProfile(ProfileStorageLocation,jobInfo.JobProfile);
+
+            using (StreamWriter jobFile = new StreamWriter(Path.Combine(ProfileStorageLocation, jobInfo.JobProfile), append:true))
+            {
+                jobFile.WriteLine($"{jobInfo.JobName},{jobInfo.SourceFileFolder},{jobInfo.S3Destination},{jobInfo.JobParameters},{(jobInfo.JobEnabled ? "true" : "false")}");
+            }
+
+
+            return false;
+        }
 
     }
 

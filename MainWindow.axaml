@@ -5,7 +5,7 @@
         mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="400"
         x:Class="S3_SimpleBackup.MainWindow"
         Title="S3_SimpleBackup"
-        Width="850" Height="600"
+        Width="900" Height="600"
         x:Name="frmMain">
 
   <Grid>
@@ -63,7 +63,7 @@
             <Button x:Name="btnRunJob" Content="Run Selected Job" Margin="5,5,5,5"/>
             <Button x:Name="btnRunAllJob" Content="Run All Jobs" Margin="5,5,5,5"/>
             <Button x:Name="btnNewJob" Content="Setup New Job" Margin="5,5,5,5"/>
-            <Button x:Name="btnEditJob" Content="Edit Job" Margin="5,5,5,5"/>
+            <Button x:Name="btnEditJob" Content="Edit Job" Margin="5,5,5,5" Click="btnEditjob_Clicked"/>
             <Button x:Name="btnDeleteJob" Content="Delete Job" Margin="5,5,5,5"/>
           </StackPanel>
 
@@ -100,6 +100,7 @@
           <StackPanel Orientation="Vertical" Spacing="10" Grid.Row="1" >
 
             <Button x:Name="dev_btnTestMsgBox" Content="Test Custom MessageBox" Click="dev_btnTestMsgBox_Clicked"/>
+            <Button x:Name="dev_btnTestEncryption" Content="Test Encryption" Click="dev_btnTestEncrytion_Clicked"/>
             <Panel Background="WhiteSmoke" >
 
               <StackPanel  Orientation="Vertical" Spacing="10" Margin="10,10,10,10">
@@ -111,6 +112,11 @@
                           Watermark="Secret Access Key"
                           PasswordChar="*"/>
                 <TextBox x:Name="dev_edtBucketName" Watermark="Bucket Name" />
+                
+                <StackPanel Orientation="Horizontal">
+                  <TextBox x:Name="dev_edtRemoteRoot" Watermark="Remote Root Folder" />
+                  <Button x:Name="dev_btnListRemoteRoot" Click="dev_btnListRemoteRoot_Clicked"/>
+                </StackPanel>
 
 
                 <StackPanel Orientation="Horizontal" Spacing="10">
