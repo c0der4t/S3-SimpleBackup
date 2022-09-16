@@ -21,8 +21,8 @@
   </ImportGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <PkgMicrosoft_CodeAnalysis_Analyzers Condition=" '$(PkgMicrosoft_CodeAnalysis_Analyzers)' == '' ">C:\Users\monte\.nuget\packages\microsoft.codeanalysis.analyzers\2.9.6</PkgMicrosoft_CodeAnalysis_Analyzers>
-    <PkgAWSSDK_Core Condition=" '$(PkgAWSSDK_Core)' == '' ">C:\Users\monte\.nuget\packages\awssdk.core\3.7.12.29</PkgAWSSDK_Core>
-    <PkgAWSSDK_S3 Condition=" '$(PkgAWSSDK_S3)' == '' ">C:\Users\monte\.nuget\packages\awssdk.s3\3.7.9.47</PkgAWSSDK_S3>
+    <PkgAWSSDK_Core Condition=" '$(PkgAWSSDK_Core)' == '' ">C:\Users\monte\.nuget\packages\awssdk.core\3.7.13.4</PkgAWSSDK_Core>
+    <PkgAWSSDK_S3 Condition=" '$(PkgAWSSDK_S3)' == '' ">C:\Users\monte\.nuget\packages\awssdk.s3\3.7.9.53</PkgAWSSDK_S3>
     <PkgAvalonia Condition=" '$(PkgAvalonia)' == '' ">C:\Users\monte\.nuget\packages\avalonia\0.10.18</PkgAvalonia>
   </PropertyGroup>
 </Project>

@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Amazon.Util.Internal;
+using Avalonia.Controls;
 using S3_SimpleBackup.Models;
 using System;
 using System.Collections.Generic;
@@ -151,9 +152,9 @@ namespace SharedMethods
                 Directory.CreateDirectory(ProfileStorageLocation);
             }
 
-            CreateNewProfile(ProfileStorageLocation,jobInfo.JobProfile);
+            CreateNewProfile(ProfileStorageLocation, jobInfo.JobProfile);
 
-            using (StreamWriter jobFile = new StreamWriter(Path.Combine(ProfileStorageLocation, jobInfo.JobProfile), append:true))
+            using (StreamWriter jobFile = new StreamWriter(Path.Combine(ProfileStorageLocation, jobInfo.JobProfile), append: true))
             {
                 jobFile.WriteLine($"{jobInfo.JobName},{jobInfo.SourceFileFolder},{jobInfo.S3Destination},{jobInfo.JobParameters},{(jobInfo.JobEnabled ? "true" : "false")}");
             }
@@ -164,5 +165,77 @@ namespace SharedMethods
 
     }
 
+    public partial class FileInteraction
+    {
 
+        public static List<FileInformation> FileIndexFromPath(string pathToSourceObject, bool isDirectory = false, bool RecursiveIndex = false)
+        {
+            //If directory, and recurse, loop method
+            //From list of objects in directory, GetFileInformation for files
+
+            List<FileInformation> listFileInformation = new List<FileInformation>();
+
+            if (RecursiveIndex)
+            {
+                // TODO: Add check for restricted file access.
+               
+
+                foreach (var subDirectory in Directory.GetDirectories(pathToSourceObject))
+                {
+                    FileInformation objectInfo = new FileInformation();
+                    objectInfo.isDirectory = true;
+                    objectInfo.FileName = subDirectory.Substring(subDirectory.LastIndexOf('\\') + 1);
+                    objectInfo.FQPath = subDirectory;
+                    listFileInformation.Add(objectInfo);
+
+                    listFileInformation.AddRange(FileIndexFromPath(subDirectory, true, RecursiveIndex));
+                }
+
+
+                foreach (var singleFile in Directory.GetFiles(pathToSourceObject))
+                {
+                    listFileInformation.Add(GetFileInformation(singleFile));
+                }
+
+                return listFileInformation;
+
+            }
+            else
+            {
+                foreach (var subDirectory in Directory.GetDirectories(pathToSourceObject))
+                {
+                    FileInformation objectInfo = new FileInformation();
+                    objectInfo.isDirectory = true;
+                    objectInfo.FileName = subDirectory.Substring(subDirectory.LastIndexOf('\\') + 1);
+                    objectInfo.FQPath = subDirectory;
+                    listFileInformation.Add(objectInfo);
+                }
+
+                foreach (var singleFile in Directory.GetFiles(pathToSourceObject))
+                {
+                    listFileInformation.Add(GetFileInformation(singleFile));
+                }
+
+                return listFileInformation;
+            }
+        }
+
+        private static FileInformation GetFileInformation(string pathToFile)
+        {
+            FileInformation objectInfo = new FileInformation();
+
+            if (File.Exists(pathToFile))
+            {
+              
+                objectInfo.isDirectory = false;
+                objectInfo.FileName = pathToFile.Substring(pathToFile.LastIndexOf('\\') + 1 );
+                objectInfo.FQPath = pathToFile;
+            }
+
+            return objectInfo;
+        }
+
+
+
+    }
 }

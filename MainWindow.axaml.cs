@@ -116,12 +116,29 @@ namespace S3_SimpleBackup
             string unEncryptedString = "This is a test string";
             await MessageBox.Show(this, $"String to encrypt \n{unEncryptedString}", "", MessageBox.MessageBoxButtons.Ok);
             await MessageBox.Show(this, $"Encrypted String \n{UnProtect.ConvertToInsecureString(Protect.EncryptString(unEncryptedString))}", "", MessageBox.MessageBoxButtons.Ok);
-            
+
         }
 
         private async void dev_btnListRemoteRoot_Clicked(object? sender, RoutedEventArgs args)
         {
-           Task<bool> result = s3Methods.Test_ListBucketContentsAsync(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), dev_edtBucketName.Text);
+            Task<bool> result = s3Methods.Test_ListBucketContentsAsync(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), dev_edtBucketName.Text);
+        }
+
+        private async void dev_btnTestSourceListing_Clicked(object? sender, RoutedEventArgs args)
+        {
+
+            OpenFolderDialog folderDialog = new OpenFolderDialog();
+            string selectedPath = await folderDialog.ShowAsync(this);
+
+            List <FileInformation> sourceFileInfo = new List<FileInformation>();
+            sourceFileInfo =  FileInteraction.FileIndexFromPath(selectedPath,true, true);
+
+            foreach (var item in sourceFileInfo)
+            {
+                Debug.WriteLine($"{item.FileName}, {item.FQPath}, {item.isDirectory}");
+            }
+
+
         }
 
         private void btnEditjob_Clicked(object? sender, RoutedEventArgs args)

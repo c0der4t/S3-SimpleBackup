@@ -8,8 +8,7 @@
     ".NETCoreApp,Version=v6.0": {
       "S3-SimpleBackup/1.0.0": {
         "dependencies": {
-          "AWSSDK.Core": "3.7.12.29",
-          "AWSSDK.S3": "3.7.9.47",
+          "AWSSDK.S3": "3.7.9.53",
           "Avalonia": "0.10.18",
           "Avalonia.Controls.DataGrid": "0.10.18",
           "Avalonia.Desktop": "0.10.18",
@@ -250,22 +249,22 @@
           }
         }
       },
-      "AWSSDK.Core/3.7.12.29": {
+      "AWSSDK.Core/3.7.13.4": {
         "runtime": {
           "lib/netcoreapp3.1/AWSSDK.Core.dll": {
             "assemblyVersion": "3.3.0.0",
-            "fileVersion": "3.7.12.29"
+            "fileVersion": "3.7.13.4"
           }
         }
       },
-      "AWSSDK.S3/3.7.9.47": {
+      "AWSSDK.S3/3.7.9.53": {
         "dependencies": {
-          "AWSSDK.Core": "3.7.12.29"
+          "AWSSDK.Core": "3.7.13.4"
         },
         "runtime": {
           "lib/netcoreapp3.1/AWSSDK.S3.dll": {
             "assemblyVersion": "3.3.0.0",
-            "fileVersion": "3.7.9.47"
+            "fileVersion": "3.7.9.53"
           }
         }
       },
@@ -1030,19 +1029,19 @@
       "path": "avalonia.x11/0.10.18",
       "hashPath": "avalonia.x11.0.10.18.nupkg.sha512"
     },
-    "AWSSDK.Core/3.7.12.29": {
+    "AWSSDK.Core/3.7.13.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-bxSbEjbCyAzjmUpxVKXiQhkXEvb3w9OHL7AOL9LItY1f5xLB9/qbtHoi5FvmZXTPPi2RahPJr9fDyHMLwQnxiA==",
-      "path": "awssdk.core/3.7.12.29",
-      "hashPath": "awssdk.core.3.7.12.29.nupkg.sha512"
+      "sha512": "sha512-aYrLHov6J6di5zFY3hxGSubsm955f1/YjwC2djl8sRY39puB3lNm7H8zbbpvch+TmLRHBmjLNI4tfL7siwzfAQ==",
+      "path": "awssdk.core/3.7.13.4",
+      "hashPath": "awssdk.core.3.7.13.4.nupkg.sha512"
     },
-    "AWSSDK.S3/3.7.9.47": {
+    "AWSSDK.S3/3.7.9.53": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-6sK6v2wWhDXZ404G9G+LUVmZdWgTJ62krxGhvQ+uagRjx/75MEwAnxEvb2sB0p5GsVO4CYh4lDJA5+eXa09XKQ==",
-      "path": "awssdk.s3/3.7.9.47",
-      "hashPath": "awssdk.s3.3.7.9.47.nupkg.sha512"
+      "sha512": "sha512-W0UG/Xq+5WA1eLGHl6fwvdpyRNXsLPP6rSBoJP3tlTckH2LZOlPQ9u5SONpcx2L2bA+RHFFv2V28gsatEwaGRg==",
+      "path": "awssdk.s3/3.7.9.53",
+      "hashPath": "awssdk.s3.3.7.9.53.nupkg.sha512"
     },
     "HarfBuzzSharp/2.8.2.1-preview.108": {
       "type": "package",

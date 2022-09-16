@@ -101,6 +101,7 @@
 
             <Button x:Name="dev_btnTestMsgBox" Content="Test Custom MessageBox" Click="dev_btnTestMsgBox_Clicked"/>
             <Button x:Name="dev_btnTestEncryption" Content="Test Encryption" Click="dev_btnTestEncrytion_Clicked"/>
+            <Button x:Name="dev_btnTestSourceListing" Content="Test SourceList" Click="dev_btnTestSourceListing_Clicked"/>
             <Panel Background="WhiteSmoke" >
 
               <StackPanel  Orientation="Vertical" Spacing="10" Margin="10,10,10,10">

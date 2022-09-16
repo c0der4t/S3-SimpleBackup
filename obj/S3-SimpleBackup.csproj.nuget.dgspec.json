@@ -45,13 +45,9 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
-            "AWSSDK.Core": {
-              "target": "Package",
-              "version": "[3.7.12.29, )"
-            },
             "AWSSDK.S3": {
               "target": "Package",
-              "version": "[3.7.9.47, )"
+              "version": "[3.7.9.53, )"
             },
             "Avalonia": {
               "target": "Package",

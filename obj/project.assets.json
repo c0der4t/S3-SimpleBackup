@@ -316,7 +316,7 @@
           }
         }
       },
-      "AWSSDK.Core/3.7.12.29": {
+      "AWSSDK.Core/3.7.13.4": {
         "type": "package",
         "compile": {
           "lib/netcoreapp3.1/AWSSDK.Core.dll": {
@@ -329,10 +329,10 @@
           }
         }
       },
-      "AWSSDK.S3/3.7.9.47": {
+      "AWSSDK.S3/3.7.9.53": {
         "type": "package",
         "dependencies": {
-          "AWSSDK.Core": "[3.7.12.29, 4.0.0)"
+          "AWSSDK.Core": "[3.7.13.4, 4.0.0)"
         },
         "compile": {
           "lib/netcoreapp3.1/AWSSDK.S3.dll": {
@@ -1705,15 +1705,15 @@
         "lib/netstandard2.0/Avalonia.X11.xml"
       ]
     },
-    "AWSSDK.Core/3.7.12.29": {
-      "sha512": "bxSbEjbCyAzjmUpxVKXiQhkXEvb3w9OHL7AOL9LItY1f5xLB9/qbtHoi5FvmZXTPPi2RahPJr9fDyHMLwQnxiA==",
+    "AWSSDK.Core/3.7.13.4": {
+      "sha512": "aYrLHov6J6di5zFY3hxGSubsm955f1/YjwC2djl8sRY39puB3lNm7H8zbbpvch+TmLRHBmjLNI4tfL7siwzfAQ==",
       "type": "package",
-      "path": "awssdk.core/3.7.12.29",
+      "path": "awssdk.core/3.7.13.4",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "awssdk.core.3.7.12.29.nupkg.sha512",
+        "awssdk.core.3.7.13.4.nupkg.sha512",
         "awssdk.core.nuspec",
         "lib/net35/AWSSDK.Core.dll",
         "lib/net35/AWSSDK.Core.pdb",
@@ -1730,16 +1730,16 @@
         "tools/account-management.ps1"
       ]
     },
-    "AWSSDK.S3/3.7.9.47": {
-      "sha512": "6sK6v2wWhDXZ404G9G+LUVmZdWgTJ62krxGhvQ+uagRjx/75MEwAnxEvb2sB0p5GsVO4CYh4lDJA5+eXa09XKQ==",
+    "AWSSDK.S3/3.7.9.53": {
+      "sha512": "W0UG/Xq+5WA1eLGHl6fwvdpyRNXsLPP6rSBoJP3tlTckH2LZOlPQ9u5SONpcx2L2bA+RHFFv2V28gsatEwaGRg==",
       "type": "package",
-      "path": "awssdk.s3/3.7.9.47",
+      "path": "awssdk.s3/3.7.9.53",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "analyzers/dotnet/cs/AWSSDK.S3.CodeAnalysis.dll",
-        "awssdk.s3.3.7.9.47.nupkg.sha512",
+        "awssdk.s3.3.7.9.53.nupkg.sha512",
         "awssdk.s3.nuspec",
         "lib/net35/AWSSDK.S3.dll",
         "lib/net35/AWSSDK.S3.pdb",
@@ -4501,8 +4501,7 @@
   },
   "projectFileDependencyGroups": {
     "net6.0": [
-      "AWSSDK.Core >= 3.7.12.29",
-      "AWSSDK.S3 >= 3.7.9.47",
+      "AWSSDK.S3 >= 3.7.9.53",
       "Avalonia >= 0.10.18",
       "Avalonia.Controls.DataGrid >= 0.10.18",
       "Avalonia.Desktop >= 0.10.18",
@@ -4556,13 +4555,9 @@
       "net6.0": {
         "targetAlias": "net6.0",
         "dependencies": {
-          "AWSSDK.Core": {
-            "target": "Package",
-            "version": "[3.7.12.29, )"
-          },
           "AWSSDK.S3": {
             "target": "Package",
-            "version": "[3.7.9.47, )"
+            "version": "[3.7.9.53, )"
           },
           "Avalonia": {
             "target": "Package",
