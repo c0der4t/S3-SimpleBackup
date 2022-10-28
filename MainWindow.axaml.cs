@@ -61,19 +61,17 @@ namespace S3_SimpleBackup
         private async void dev_btnTestConnection_Clicked(object? sender, RoutedEventArgs args)
         {
             dev_btnTestConnection.Content = "Testing Connection...";
-            bool ConnectionSuccess = await s3Methods.Test_BucketConnectionAsync(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), dev_edtBucketName.Text);
+            string ConnectionSuccess = await s3Methods.Test_BucketConnectionAsync(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), dev_edtBucketName.Text,this);
 
             dev_btnTestConnection.Content = "Test Connection";
 
-            if (ConnectionSuccess)
+            if (!ConnectionSuccess.Contains("Error"))
             {
                 await MessageBox.Show(frmMain, $"Successfully listed objects in bucket: {dev_edtBucketName.Text}", "Connection Verified", MessageBox.MessageBoxButtons.Ok);
-                Output.WriteToUI($"Successfully listed objects in bucket: {dev_edtBucketName.Text}", this);
-            }
+             }
             else
             {
-                await MessageBox.Show(frmMain, $"Failed to list objects in bucket: {dev_edtBucketName.Text}", "Connection Failed", MessageBox.MessageBoxButtons.Ok);
-                Output.WriteToUI($"Failed to list objects in bucket: {dev_edtBucketName.Text}", this);
+                await MessageBox.Show(frmMain, ConnectionSuccess, "Connection Failed", MessageBox.MessageBoxButtons.Ok);
             }
         }
 

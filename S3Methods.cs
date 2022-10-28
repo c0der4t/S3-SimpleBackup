@@ -35,11 +35,16 @@ namespace S3_SimpleBackup
         /// <param name="s3AccessKey">The access / user key for S3 host</param>
         /// <param name="s3SecureKey">The secret key for the S3 host</param>
         /// <param name="bucketToTarget">The full name of the bucket to target</param>
+        /// /// <param name="parentWindow">Reference to the window calling the function. Normally equal to 'this'</param>
         /// <returns></returns>
-        public async Task<bool> Test_BucketConnectionAsync(string s3Host, string s3AccessKey, SecureString s3SecureKey, string bucketToTarget)
+        public async Task<string> Test_BucketConnectionAsync(string s3Host, string s3AccessKey, SecureString s3SecureKey, string bucketToTarget, Window parentWindow)
         {
+            //TODO: Add an auto cancel token to cancel after 40 seconds
             try
             {
+                Output.WriteToUI($"[TEST] Testing Connection to Bucket: {bucketToTarget}", parentWindow);
+
+                Output.WriteToUI($"[TEST] Spawning S3Client", parentWindow);
                 IAmazonS3 _s3Client = GenerateS3Client(s3Host, s3AccessKey, s3SecureKey);
 
                 var request = new ListObjectsV2Request
@@ -50,17 +55,18 @@ namespace S3_SimpleBackup
 
                 var response = new ListObjectsV2Response();
 
+                Output.WriteToUI($"[TEST] Connecting to server...", parentWindow);
                 response = await _s3Client.ListObjectsV2Async(request);
-                return true;
-
-
+                Output.WriteToUI($"[TEST] Connection Succeeded", parentWindow);
+                return "Connection Succeeded";
 
 
             }
             catch (AmazonS3Exception ex)
             {
-                Debug.WriteLine($"Error encountered on server. Message:'{ex.Message}' getting list of objects.");
-                return false;
+                Debug.WriteLine($"Error encountered on server:'{ex.Message}'");
+                Output.WriteToUI($"[TEST] Error encountered on server:'{ex.Message}'", parentWindow);
+                return $"Error encountered: \n'{ex.Message}'";
             }
         }
 
@@ -153,7 +159,7 @@ namespace S3_SimpleBackup
 
                 await _s3Client.PutObjectAsync(putRequest);
 
-                Output.WriteToUI($"[TEST] Uploaded File: {itemToUploadPath}", parentWindow);
+                Output.WriteToUI($"[TEST] Uploaded file: {itemToUploadPath}", parentWindow);
 
                 return true;
 
