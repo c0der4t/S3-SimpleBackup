@@ -14,6 +14,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using SharedMethods;
 using DataProtection;
+using System.Threading;
 
 namespace S3_SimpleBackup
 {
@@ -83,7 +84,7 @@ namespace S3_SimpleBackup
                 var request = new ListObjectsV2Request
                 {
                     BucketName = bucketToTarget,
-                    MaxKeys = 100,
+                    MaxKeys = 1000,
                     Prefix = rootFolderPath
                 };
 
@@ -171,6 +172,42 @@ namespace S3_SimpleBackup
                 return false;
             }
         }
+
+        public void UploadDirectoryToS3(string s3Host, string s3AccessKey, SecureString s3SecureKey, string localDirectory, string s3BucketName)
+        {
+            // Create an S3 client
+            var s3Client = GenerateS3Client(s3Host,s3AccessKey,s3SecureKey);
+
+            // Get a list of all files in the directory
+            var files = Directory.GetFiles(localDirectory, "*", SearchOption.AllDirectories);
+
+            Debug.WriteLine($"TIME: {DateTime.Now}");
+            int FileCount = 0;
+            // Use Parallel.ForEach to upload each file concurrently
+
+            foreach (var singlefile in files)
+            {
+                // Calculate the S3 key for the file (i.e. the file's path within the bucket)
+                var s3Key = singlefile.Replace(localDirectory + System.IO.Path.DirectorySeparatorChar, "");
+
+                // Create a PutObjectRequest to upload the file
+                var request = new PutObjectRequest
+                {
+                    BucketName = s3BucketName,
+                    Key = s3Key,
+                    FilePath = singlefile
+                };
+
+                Debug.WriteLine($"Start: {s3Key}\\{singlefile}");
+                // Upload the file to S3
+                s3Client.PutObjectAsync(request);
+                Debug.WriteLine($"Stop: {s3Key}\\{singlefile}");
+                FileCount++;
+            };
+
+            Debug.WriteLine($"TIME: {DateTime.Now}");
+        }
+
     }
 
 }

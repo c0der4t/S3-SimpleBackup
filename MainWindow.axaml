@@ -60,7 +60,7 @@
           <TextBlock Text="Manage backup jobs:"/>
 
           <StackPanel x:Name="spnlJobsButtons" Orientation="Horizontal" Spacing="5">
-            <Button x:Name="btnRunJob" Content="Run Selected Job" Margin="5,5,5,5"/>
+            <Button x:Name="btnRunJob" Content="Run Selected Job" Margin="5,5,5,5" Click="btnRunjob_Clicked"/>
             <Button x:Name="btnRunAllJob" Content="Run All Jobs" Margin="5,5,5,5"/>
             <Button x:Name="btnNewJob" Content="Setup New Job" Margin="5,5,5,5"/>
             <Button x:Name="btnEditJob" Content="Edit Job" Margin="5,5,5,5" Click="btnEditjob_Clicked"/>

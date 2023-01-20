@@ -61,14 +61,14 @@ namespace S3_SimpleBackup
         private async void dev_btnTestConnection_Clicked(object? sender, RoutedEventArgs args)
         {
             dev_btnTestConnection.Content = "Testing Connection...";
-            string ConnectionSuccess = await s3Methods.Test_BucketConnectionAsync(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), dev_edtBucketName.Text,this);
+            string ConnectionSuccess = await s3Methods.Test_BucketConnectionAsync(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), dev_edtBucketName.Text, this);
 
             dev_btnTestConnection.Content = "Test Connection";
 
             if (!ConnectionSuccess.Contains("Error"))
             {
                 await MessageBox.Show(frmMain, $"Successfully listed objects in bucket: {dev_edtBucketName.Text}", "Connection Verified", MessageBox.MessageBoxButtons.Ok);
-             }
+            }
             else
             {
                 await MessageBox.Show(frmMain, ConnectionSuccess, "Connection Failed", MessageBox.MessageBoxButtons.Ok);
@@ -128,8 +128,8 @@ namespace S3_SimpleBackup
             OpenFolderDialog folderDialog = new OpenFolderDialog();
             string selectedPath = await folderDialog.ShowAsync(this);
 
-            List <FileInformation> sourceFileInfo = new List<FileInformation>();
-            sourceFileInfo =  FileInteraction.FileIndexFromPath(selectedPath,true, true);
+            List<FileInformation> sourceFileInfo = new List<FileInformation>();
+            sourceFileInfo = FileInteraction.FileIndexFromPath(selectedPath, true, true);
 
             foreach (var item in sourceFileInfo)
             {
@@ -143,6 +143,13 @@ namespace S3_SimpleBackup
         {
             JobManager jobManagerWindow = new JobManager("edit", _Jobs[dbgJobsList.SelectedIndex]);
             jobManagerWindow.ShowDialog(this);
+
+        }
+
+        private void btnRunjob_Clicked(object? sender, RoutedEventArgs args)
+        {
+            BackupJobModel Src = dbgJobsList.SelectedItem as BackupJobModel;
+            s3Methods.UploadDirectoryToS3(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), Src.SourceFileFolder, dev_edtBucketName.Text);
 
         }
 
