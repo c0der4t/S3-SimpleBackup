@@ -25,10 +25,12 @@ namespace S3_SimpleBackup
             InitializeComponent();
             LoadJobConfiguration();
 
-            //Check if dev keys exist. If so load them into th dev tab
-            if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "devinfo.txt")))
+            tabDev.IsVisible = AppConfig.ShowDevWindow;
+
+            //Check if s3 keys exist. If so load them
+            if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "s3.ini")))
             {
-                using (StreamReader devInfo = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), "devinfo.txt")))
+                using (StreamReader devInfo = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), "s3.ini")))
                 {
                     string currLine = "";
                     int lineCounter = 0;
@@ -47,18 +49,16 @@ namespace S3_SimpleBackup
                             case 3:
                                 dev_edtSecretAccessKey.Text = currLine;
                                 break;
-                            case 4:
-                                dev_edtBucketName.Text = currLine;
-                                break;
                             default:
                                 break;
                         }
                     }
                 }
             }
+
         }
 
-        private async void dev_btnTestConnection_Clicked(object? sender, RoutedEventArgs args)
+        private async void btnTestConnection_Clicked(object? sender, RoutedEventArgs args)
         {
             dev_btnTestConnection.Content = "Testing Connection...";
             string ConnectionSuccess = await s3Methods.Test_BucketConnectionAsync(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), dev_edtBucketName.Text, this);
@@ -75,7 +75,7 @@ namespace S3_SimpleBackup
             }
         }
 
-        private async void dev_btnUploadTestFile_Clicked(object? sender, RoutedEventArgs args)
+        private async void btnUploadTestFile_Clicked(object? sender, RoutedEventArgs args)
         {
             bool UploadSuccess = false;
 
@@ -103,6 +103,24 @@ namespace S3_SimpleBackup
 
         }
 
+        private async void btnEmptyBucket_Clicked(object? sender, RoutedEventArgs args)
+        {
+            var confirmDelete =  await MessageBox.Show(this, $"This will delete everything in bucket {dev_edtBucketName.Text}\nWould you like to proceed?\n\nTHIS CANNOT BE UNDONE!", "Important Warning!", MessageBox.MessageBoxButtons.YesNo);
+            if (confirmDelete == MessageBox.MessageBoxResult.Yes)
+            {
+                Output.WriteToUI($"First confirm received to empty bucket {dev_edtBucketName.Text}", this);
+
+                var secondConfirmDelete = await MessageBox.Show(this, $"Please confirm again that you'd like to empty bucket:\n{dev_edtBucketName.Text}\n\nThis is the final warning!", "Final Warning!", MessageBox.MessageBoxButtons.YesNo);
+                if (secondConfirmDelete == MessageBox.MessageBoxResult.Yes)
+                {
+                    Output.WriteToUI($"Second confirm received to empty bucket {dev_edtBucketName.Text}", this);
+                    
+                   s3Methods.DeleteAllObjectsinBucket(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), dev_edtBucketName.Text,this);
+
+                }
+            }
+        }
+
         private async void dev_btnTestMsgBox_Clicked(object? sender, RoutedEventArgs args)
         {
             await MessageBox.Show(this, "This is a custom messagebox test\nThis is a second line", "Test MessageBox", MessageBox.MessageBoxButtons.Ok);
@@ -117,9 +135,10 @@ namespace S3_SimpleBackup
 
         }
 
-        private async void dev_btnListRemoteRoot_Clicked(object? sender, RoutedEventArgs args)
+        private void chckbxEnableEmptyBucketTool_CheckChanged(object sender, RoutedEventArgs e)
         {
-            Task<bool> result = s3Methods.Test_ListBucketContentsAsync(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), dev_edtBucketName.Text);
+            edtEmptyBucketTarget.IsEnabled = chckbxEnableEmptyBucketTool.IsChecked ?? false;
+            btnEmptyBucket.IsEnabled = chckbxEnableEmptyBucketTool.IsChecked ?? false;
         }
 
         private async void dev_btnTestSourceListing_Clicked(object? sender, RoutedEventArgs args)
@@ -133,40 +152,113 @@ namespace S3_SimpleBackup
 
             foreach (var item in sourceFileInfo)
             {
-                Debug.WriteLine($"{item.FileName}, {item.FQPath}, {item.isDirectory}");
+                Debug.WriteLine($"{item.ObjectName}, {item.FQPath}, {item.isDirectory}");
             }
 
 
         }
 
-        private void btnEditjob_Clicked(object? sender, RoutedEventArgs args)
+        private async void btnNewjob_Clicked(object? sender, RoutedEventArgs args)
         {
-            JobManager jobManagerWindow = new JobManager("edit", _Jobs[dbgJobsList.SelectedIndex]);
-            jobManagerWindow.ShowDialog(this);
+
+            List<string> profiles = new List<string>();
+            foreach (var job in _Jobs)
+            {
+                if (!profiles.Contains(job.JobProfile))
+                {
+                    profiles.Add(job.JobProfile);
+                }
+            }
+            JobManager jobManagerWindow = new JobManager("new", null, profiles);
+            await jobManagerWindow.ShowDialog(this);
+
+            _Jobs.Clear();
+            dbgJobsList.Items = null;
+            LoadJobConfiguration();
+        }
+
+        private async void btnEditjob_Clicked(object? sender, RoutedEventArgs args)
+        {
+            List<string> profiles = new List<string>();
+            foreach (var job in _Jobs)
+            {
+                if (!profiles.Contains(job.JobProfile))
+                {
+                    profiles.Add(job.JobProfile);
+                }
+            }
+            JobManager jobManagerWindow = new JobManager("edit", _Jobs[dbgJobsList.SelectedIndex],profiles);
+            await jobManagerWindow.ShowDialog(this);
+
+            _Jobs.Clear();
+            dbgJobsList.Items = null;
+            LoadJobConfiguration();
 
         }
 
-        private void btnRunjob_Clicked(object? sender, RoutedEventArgs args)
+        private async void btnDeleteJob_Clicked(object? sender, RoutedEventArgs args)
+        {
+            BackupJobModel selectedJob = dbgJobsList.SelectedItem as BackupJobModel;
+            var confirmDelete = await MessageBox.Show(this, $"This will delete job {selectedJob.JobName}\nWould you like to proceed?\n\nTHIS CANNOT BE UNDONE!", "Important Warning!", MessageBox.MessageBoxButtons.YesNo);
+
+            if (confirmDelete == MessageBox.MessageBoxResult.Yes)
+            {
+                await DoInputOutput.DeleteJobAsync(_Jobs[dbgJobsList.SelectedIndex], this);
+
+                _Jobs.Clear();
+                dbgJobsList.Items = null;
+                LoadJobConfiguration();
+
+            }
+            
+        }
+
+
+        private async void btnRunjob_Clicked(object? sender, RoutedEventArgs args)
         {
             BackupJobModel Src = dbgJobsList.SelectedItem as BackupJobModel;
-            s3Methods.UploadDirectoryToS3(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), Src.SourceFileFolder, dev_edtBucketName.Text);
+            s3Methods.UploadToS3(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), Src.SourceFileFolder, Src.S3BucketName,Src.JobName,Src.JobParameters.Contains("/r"), this);
+       
+        }
 
+        private async void btnRunAllJob_Clicked(object? sender, RoutedEventArgs args)
+        {
+            foreach (var item in dbgJobsList.Items)
+            {
+                BackupJobModel Src = item as BackupJobModel;
+                s3Methods.UploadToS3(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), Src.SourceFileFolder, Src.S3BucketName, Src.JobName, Src.JobParameters.Contains("/r"), this);
+            }
         }
 
         private void LoadJobConfiguration()
         {
-            Output.WriteToUI($"Current Profile Location: {Path.Combine(Directory.GetCurrentDirectory(), "Profiles")}", this);
+            #region Load Settings
+
+            DoInputOutput.LoadSettings();
+            Debug.WriteLine(AppConfig.ProfileStorageLocation);
+
+            #endregion
+
+
+            #region Load Jobs
+            
+
+            Output.WriteToUI($"Current Profile Location: {AppConfig.ProfileStorageLocation}", this);
             try
             {
-                _Jobs = new ObservableCollection<BackupJobModel>(DoInputOutput.LoadJobsFiles(Path.Combine(Directory.GetCurrentDirectory(), "Profiles"), this));
+                _Jobs = new ObservableCollection<BackupJobModel>(DoInputOutput.LoadJobsFiles(this));
             }
             catch (System.Exception e)
             {
-                Output.WriteToUI($"An error occured while loading profiles: {e.ToString()}", this);
+                Output.WriteToUI($"An error occurred while loading profiles: {e.ToString()}", this);
             }
 
             dbgJobsList.AutoGenerateColumns = true;
             dbgJobsList.Items = _Jobs;
+
+            #endregion
+
+
         }
 
     }

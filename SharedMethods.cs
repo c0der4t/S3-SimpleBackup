@@ -1,9 +1,11 @@
 ﻿using Amazon.Util.Internal;
 using Avalonia.Controls;
+using MsgBox;
 using S3_SimpleBackup.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using System.IO;
 using System.Linq;
@@ -20,35 +22,55 @@ namespace SharedMethods
     {
         public static void WriteToUI(string LinetoWrite, Window OutputWindow, string NameofOutputComponent = "edtLogOutput")
         {
-            OutputWindow.FindControl<TextBox>(NameofOutputComponent).Text = OutputWindow.FindControl<TextBox>(NameofOutputComponent).Text + $"\n- {LinetoWrite}";
+            string DateTimeStamp = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss:ff");
+            LinetoWrite = $"\n{DateTimeStamp}\t{LinetoWrite}";
+
+            string CurrText = OutputWindow.FindControl<TextBox>(NameofOutputComponent).Text == null ? "" : OutputWindow.FindControl<TextBox>(NameofOutputComponent).Text;
+
+            OutputWindow.FindControl<TextBox>(NameofOutputComponent).Text = StringSizeinMB(CurrText) < 1 ? CurrText + LinetoWrite : LinetoWrite;
+
+            if (CurrText != null)
+            {
+                OutputWindow.FindControl<TextBox>(NameofOutputComponent).CaretIndex = CurrText.Length + 1;
+            }
+
+            CurrText = null;
+            LinetoWrite = null;
+
         }
 
+        public static double StringSizeinMB(string StringtoMeasure)
+        {
+            byte[] bytes = Encoding.Unicode.GetBytes(StringtoMeasure);
+            double sizeInMB = (double)bytes.Length / (1024 * 1024);
+            return sizeInMB;
 
+        }
     }
 
     public partial class DoInputOutput
     {
-        public static List<BackupJobModel> LoadJobsFiles(string ProfileStorageLocation, Window parentWindow, string ProfiletoLoad = "*")
+        public static List<BackupJobModel> LoadJobsFiles(Window parentWindow, string ProfiletoLoad = "*")
         {
             List<BackupJobModel> _Jobs = new List<BackupJobModel>();
             _Jobs.Clear();
 
-            if (!Directory.Exists(ProfileStorageLocation))
+            if (!Directory.Exists(AppConfig.ProfileStorageLocation))
             {
                 throw new DirectoryNotFoundException("Profile Storage Location Does not Exist. Check Your Settings");
             }
             else
             {
-                foreach (var currentJobFile in Directory.GetFiles(ProfileStorageLocation))
+                foreach (var currentProfileFile in Directory.GetFiles(AppConfig.ProfileStorageLocation))
                 {
                     //Read each line
                     //Each line should be one job
                     //Send the job line to the job parser method
                     //Expect a BackupJobModel back
-                    string profileName = Path.GetFileNameWithoutExtension(currentJobFile);
+                    string profileName = Path.GetFileNameWithoutExtension(currentProfileFile);
                     Output.WriteToUI($"Loading profile: {profileName}", parentWindow);
 
-                    foreach (string currLine in System.IO.File.ReadLines(currentJobFile))
+                    foreach (string currLine in System.IO.File.ReadLines(currentProfileFile))
                     {
                         BackupJobModel processedJobItem = ParseJobItem(profileName, currLine, parentWindow);
 
@@ -74,48 +96,17 @@ namespace SharedMethods
             if (rawJobItem[0] != '#')
             {
                 BackupJobModel jobItem = new BackupJobModel();
+
+                string[] columns = rawJobItem.Split(',');
+
                 jobItem.JobProfile = ProfileName;
+                jobItem.JobName = columns[0];
+                jobItem.SourceFileFolder = columns[1];
+                jobItem.S3Destination = columns[2];
+                jobItem.S3BucketName = columns[3];
+                jobItem.JobParameters = columns[4];
+                jobItem.RunWithProfile = columns[5].ToLower() == "true" ? true : false;
 
-                int lengthCurrLine = rawJobItem.Length;
-                int colNumber = 0;
-
-                string jobName = "";
-                string sourceFileFolder = "";
-                string s3Destination = "";
-
-
-                while (lengthCurrLine > 0)
-                {
-                    colNumber += 1;
-                    int indexOfDelimeter = rawJobItem.IndexOf(',') > -1 ? rawJobItem.IndexOf(',') : lengthCurrLine;
-                    string currColValue = rawJobItem.Substring(0, indexOfDelimeter);
-
-                    rawJobItem = rawJobItem.IndexOf(',') > -1 ? rawJobItem.Substring(currColValue.Length + 1) : "";
-                    lengthCurrLine = rawJobItem.Length;
-
-                    switch (colNumber)
-                    {
-                        case 1:
-                            jobItem.JobName = currColValue;
-                            break;
-                        case 2:
-                            jobItem.SourceFileFolder = currColValue;
-                            break;
-                        case 3:
-                            jobItem.S3Destination = currColValue;
-                            break;
-                        case 4:
-                            jobItem.JobParameters = currColValue;
-                            break;
-                        case 5:
-                            jobItem.JobEnabled = currColValue.ToLower() == "true" ? true : false;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                Output.WriteToUI($"Loaded job: {jobName}", parentWindow);
                 return jobItem;
             }
             else
@@ -124,42 +115,197 @@ namespace SharedMethods
             }
         }
 
-        public static void CreateNewProfile(string ProfileStorageLocation, string ProfileName)
+        public static void CreateProfileIfNotExists(string ProfileName)
         {
             //Redundant on purpose: Create profile file
-            if (!File.Exists(Path.Combine(ProfileStorageLocation, ProfileName)))
+            if (!File.Exists(Path.Combine(AppConfig.ProfileStorageLocation, ProfileName)))
             {
-                File.Create(Path.Combine(ProfileStorageLocation, ProfileName));
 
                 //Add default comments to the file
-                using (StreamWriter newProfileFile = new StreamWriter(Path.Combine(ProfileStorageLocation, ProfileName)))
+                using (StreamWriter newProfileFile = new StreamWriter(Path.Combine(AppConfig.ProfileStorageLocation, ProfileName)))
                 {
                     newProfileFile.WriteLine("#This is a Simple S3 profile file");
                     newProfileFile.WriteLine("#Fields starting with # are considered comments");
                     newProfileFile.WriteLine("#Field Format:");
-                    newProfileFile.WriteLine("#JobName,SourceFileFolder,S3Destination,JobParameterString,isJobEnabled");
+                    newProfileFile.WriteLine("#JobName,LocalPath,S3Path,BucketName,JobParameterString,doRunWithProfile");
                 }
 
             }
 
         }
 
-        public static bool CreateNewJob(string ProfileStorageLocation, BackupJobModel jobInfo)
+        public static async Task<bool> CreateNewJobAsync(BackupJobModel jobInfo, Window parentWindow)
         {
-            //Check if profile exists
-            if (!Directory.Exists(ProfileStorageLocation))
+            try
             {
-                Directory.CreateDirectory(ProfileStorageLocation);
+
+                CreateProfileIfNotExists(jobInfo.JobProfile);
+
+                using (StreamWriter jobFile = new StreamWriter(Path.Combine(AppConfig.ProfileStorageLocation, jobInfo.JobProfile), append: true))
+                {
+                    jobFile.WriteLine($"{jobInfo.JobName},{jobInfo.SourceFileFolder},{jobInfo.S3Destination},{jobInfo.S3BucketName},{jobInfo.JobParameters},{(jobInfo.RunWithProfile ? "true" : "false")}");
+                }
+
+                return true;
+
+            }
+            catch (Exception newjobEx)
+            {
+                await MessageBox.Show(parentWindow, $"An error while creating/updating job:\n{newjobEx.Message}", "Job Change Failed", MessageBox.MessageBoxButtons.Ok);
+                return false;
             }
 
-            CreateNewProfile(ProfileStorageLocation, jobInfo.JobProfile);
+        }
 
-            using (StreamWriter jobFile = new StreamWriter(Path.Combine(ProfileStorageLocation, jobInfo.JobProfile), append: true))
+        public static async Task<bool> UpdateJobAsync(string OldJobName, BackupJobModel jobInfo, Window parentWindow)
+        {
+            try
+            { 
+                List <BackupJobModel> newJobsforProfile = new List<BackupJobModel>();
+                CreateProfileIfNotExists(jobInfo.JobProfile);
+
+                //Load the profile file, and find the job to update
+                foreach (string currLine in System.IO.File.ReadLines(Path.Combine(AppConfig.ProfileStorageLocation,jobInfo.JobProfile)))
+                {
+                    BackupJobModel processedJobItem = ParseJobItem(jobInfo.JobProfile, currLine, parentWindow);
+
+                    if (processedJobItem != null)
+                    {
+                       newJobsforProfile.Add(processedJobItem.JobName != OldJobName ? processedJobItem : jobInfo);
+                    }
+                }
+
+                File.Delete(Path.Combine(AppConfig.ProfileStorageLocation, jobInfo.JobProfile));
+
+                foreach (BackupJobModel singleJob in newJobsforProfile)
+                {
+                    CreateNewJobAsync(singleJob, parentWindow);
+                }
+
+                return true;
+            }
+            catch (Exception newjobEx)
             {
-                jobFile.WriteLine($"{jobInfo.JobName},{jobInfo.SourceFileFolder},{jobInfo.S3Destination},{jobInfo.JobParameters},{(jobInfo.JobEnabled ? "true" : "false")}");
+                await MessageBox.Show(parentWindow, $"An error while creating/updating job:\n{newjobEx.Message}", "Job Change Failed", MessageBox.MessageBoxButtons.Ok);
+                return false;
             }
 
 
+        }
+
+        public static async Task<bool> DeleteJobAsync(BackupJobModel jobInfo, Window parentWindow)
+        {
+            try
+            {
+                List<BackupJobModel> newJobsforProfile = new List<BackupJobModel>();
+                CreateProfileIfNotExists(jobInfo.JobProfile);
+
+                //Load the profile file, and find the job to update
+                foreach (string currLine in System.IO.File.ReadLines(Path.Combine(AppConfig.ProfileStorageLocation, jobInfo.JobProfile)))
+                {
+                    BackupJobModel processedJobItem = ParseJobItem(jobInfo.JobProfile, currLine, parentWindow);
+
+                    if (processedJobItem != null)
+                    {
+                        if (processedJobItem.JobName != jobInfo.JobName)
+                        {
+                            newJobsforProfile.Add(processedJobItem);
+                        }
+                    }
+                }
+
+                File.Delete(Path.Combine(AppConfig.ProfileStorageLocation, jobInfo.JobProfile));
+
+                foreach (BackupJobModel singleJob in newJobsforProfile)
+                {
+                    CreateNewJobAsync(singleJob, parentWindow);
+                }
+
+                Output.WriteToUI($"Successfully Deleted Job {jobInfo.JobName}", parentWindow);
+                return true;
+            }
+            catch (Exception newjobEx)
+            {
+                await MessageBox.Show(parentWindow, $"An error while deleting job:\n{newjobEx.Message}", "Job Deletion Failed", MessageBox.MessageBoxButtons.Ok);
+                Output.WriteToUI($"An error while deleting job:\n{newjobEx.Message}", parentWindow);
+                return false;
+            }
+
+
+        }
+
+        public static void LoadSettings()
+        {
+            if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "settings.ini")))
+            {
+                using (StreamReader settingsFile = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), "settings.ini")))
+                {
+                    string currLine = "";
+                    int lineCounter = 0;
+
+                    while ((currLine = settingsFile.ReadLine()) != null)
+                    {
+                        lineCounter += 1;
+
+                        switch (lineCounter)
+                        {
+                            case 1:
+                                AppConfig.ShowDevWindow = currLine.ToLower() == "true" ? true : false;
+                                break;
+                            case 2:
+                                AppConfig.WritetoLogFile = currLine.ToLower() == "true" ? true : false;
+                                break;
+                            case 3:
+                                AppConfig.RequireLogin = currLine.ToLower() == "true" ? true : false;
+                                break;
+                            case 4:
+                                AppConfig.LogFileStorageLocation = currLine.Contains("%appdir%") ? currLine.Replace("%appdir%", Directory.GetCurrentDirectory()).Replace('/', '\\') : currLine.Replace('/', '\\');
+                                break;
+                            case 5:
+                                AppConfig.LogFilePrefix = currLine;
+                                break;
+                            case 6:
+                                AppConfig.ProfileStorageLocation = currLine.Contains("%appdir%") ? currLine.Replace("%appdir%", Directory.GetCurrentDirectory()).Replace('/', '\\') : currLine.Replace('/', '\\');
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+
+            }
+            else
+            {
+                AppConfig.ShowDevWindow = false;
+                AppConfig.WritetoLogFile = false;
+                AppConfig.RequireLogin = false;
+
+                AppConfig.ProfileStorageLocation = "";
+                AppConfig.ProfileStorageLocation = "";
+                AppConfig.ProfileStorageLocation = "";
+            }
+        }
+
+        public static bool WriteSettings()
+        {
+            try
+            {
+                using (StreamWriter settingFile = new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), "settings.ini")))
+                {
+                    settingFile.WriteLine(AppConfig.ShowDevWindow ? "true" : "false");
+                    settingFile.WriteLine(AppConfig.WritetoLogFile ? "true" : "false");
+                    settingFile.WriteLine(AppConfig.RequireLogin ? "true" : "false");
+
+                    settingFile.WriteLine(AppConfig.LogFileStorageLocation);
+                    settingFile.WriteLine(AppConfig.LogFilePrefix);
+                    settingFile.WriteLine(AppConfig.ProfileStorageLocation);
+                }
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
             return false;
         }
 
@@ -178,14 +324,15 @@ namespace SharedMethods
             if (RecursiveIndex)
             {
                 // TODO: Add check for restricted file access.
-               
+
 
                 foreach (var subDirectory in Directory.GetDirectories(pathToSourceObject))
                 {
                     FileInformation objectInfo = new FileInformation();
                     objectInfo.isDirectory = true;
-                    objectInfo.FileName = subDirectory.Substring(subDirectory.LastIndexOf('\\') + 1);
+                    objectInfo.ObjectName = subDirectory.Substring(subDirectory.LastIndexOf('\\') + 1);
                     objectInfo.FQPath = subDirectory;
+                    objectInfo.FileSize = 0;
                     listFileInformation.Add(objectInfo);
 
                     listFileInformation.AddRange(FileIndexFromPath(subDirectory, true, RecursiveIndex));
@@ -206,7 +353,7 @@ namespace SharedMethods
                 {
                     FileInformation objectInfo = new FileInformation();
                     objectInfo.isDirectory = true;
-                    objectInfo.FileName = subDirectory.Substring(subDirectory.LastIndexOf('\\') + 1);
+                    objectInfo.ObjectName = subDirectory.Substring(subDirectory.LastIndexOf('\\') + 1);
                     objectInfo.FQPath = subDirectory;
                     listFileInformation.Add(objectInfo);
                 }
@@ -216,6 +363,7 @@ namespace SharedMethods
                     listFileInformation.Add(GetFileInformation(singleFile));
                 }
 
+                listFileInformation.Sort((x, y) => x.FileSize.CompareTo(y.FileSize));
                 return listFileInformation;
             }
         }
@@ -226,10 +374,12 @@ namespace SharedMethods
 
             if (File.Exists(pathToFile))
             {
-              
+
                 objectInfo.isDirectory = false;
-                objectInfo.FileName = pathToFile.Substring(pathToFile.LastIndexOf('\\') + 1 );
+                objectInfo.ObjectName = pathToFile.Substring(pathToFile.LastIndexOf('\\') + 1);
                 objectInfo.FQPath = pathToFile;
+                objectInfo.FileSize = new FileInfo(pathToFile).Length;
+                objectInfo.FileHash = DataProtection.Hash.CalculateSHA256Hash_FromFilePath(pathToFile);
             }
 
             return objectInfo;

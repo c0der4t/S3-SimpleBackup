@@ -1,17 +1,14 @@
 ﻿namespace S3_SimpleBackup.Models
 {
-    public class ConfigModel
+    public static class AppConfig
     {
-        public bool ShowDevWindow { get; set; }
-        public bool WritetoLogFile { get; set; }
+        public static bool ShowDevWindow { get; set; }
+        public static bool WritetoLogFile { get; set; }
+        public static bool RequireLogin { get; set; }
 
-        public string LogFileStorageLocation { get; set; }
-        public string LogFilePrefix { get; set; }
-        public string ProfileStorageLocation { get; set; }
-
-
-
-
+        public static string LogFileStorageLocation { get; set; }
+        public static string LogFilePrefix { get; set; }
+        public static string ProfileStorageLocation { get; set; }
 
     }
 }

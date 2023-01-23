@@ -4,14 +4,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="S3_SimpleBackup.JobManager"
-        Title="Job Manager" x:Name="frmJobManager" Activated="frmJobManager_Activated"
-        Width="500" Height="300">
+        Title="Job Manager" x:Name="frmJobManager"
+        MinWidth="520" MinHeight="360" MaxWidth="520" MaxHeight="390">
 
   <Grid>
 
     <Grid.RowDefinitions>
       <RowDefinition Height="10"/>
       <RowDefinition Height="*"/>
+      <RowDefinition Height="auto"/>
       <RowDefinition Height="10"/>
     </Grid.RowDefinitions>
     <Grid.ColumnDefinitions>
@@ -21,29 +22,49 @@
     </Grid.ColumnDefinitions>
 
     <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Vertical" Spacing="10">
-      <StackPanel Orientation="Horizontal" Spacing="5">
-        
-      </StackPanel>
 
       <Grid x:Name="grdProfileSelector">
+
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*"/>
+          <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="75"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="Profile" Grid.Row="0" Grid.Column="0"
+                   Margin="0,0,5,0" VerticalAlignment="Center"/>
+   
+          <ComboBox x:Name="cmbxProfileSelector"
+                 Grid.Row="0" Grid.Column="1" PlaceholderText="Assign Job to a Profile"
+                  MinWidth="300" MaxWidth="300" SelectionChanged="cmbxProfileSelector_SelectionChanged"/>
+
+        <TextBox x:Name="edtNewProfileName" Grid.Row="1" Grid.Column="1"
+                 IsVisible="false"/>
+        
+      </Grid>
+
+      <Grid>
 
         <Grid.RowDefinitions>
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="75"/>
           <ColumnDefinition Width="*"/>
-          <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
 
-        <ComboBox x:Name="cmbxProfileSelector"
-                 Grid.Row="0" Grid.Column="0" PlaceholderText="Assign Job to a Profile"/>
-        <Button Content="Manage Profiles" 
-                Grid.Row="0" Grid.Column="1"/>
-        
+        <TextBlock Text="Job Name" Grid.Row="0" Grid.Column="0"
+                   Margin="0,0,5,0" VerticalAlignment="Center"/>
+        <TextBox x:Name="edtJobName"
+                 Grid.Row="0" Grid.Column="1"/>
+
       </Grid>
       
-      <TextBox x:Name="edtJobName" />
 
       <Grid x:Name="grdSourceFiles">
 
@@ -52,16 +73,20 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="75"/>
           <ColumnDefinition Width="*"/>
-          <ColumnDefinition Width="auto"/>
+         <!-- <ColumnDefinition Width="auto"/> -->
         </Grid.ColumnDefinitions>
 
-        <TextBox x:Name="edtSource" Grid.Row="0"
-                 Grid.Column="0"/>
-        <Button Content="..." Grid.Row="0"
-                 Grid.Column="1"/>
+        <TextBlock Text="Local Path" Grid.Row="0" Grid.Column="0"
+                   Margin="0,0,5,0" VerticalAlignment="Center"/>
+
+        <TextBox x:Name="edtSource" Grid.Row="0" Grid.Column="1"/>
+        <!-- <Button Content="..." Grid.Row="0" Grid.Column="2"/> -->
 
       </Grid>
+      
+      
      
       <Grid x:Name="grdDestinationFiles">
 
@@ -70,31 +95,74 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="75"/>
           <ColumnDefinition Width="*"/>
-          <ColumnDefinition Width="auto"/>
+          <!-- <ColumnDefinition Width="auto"/> -->
         </Grid.ColumnDefinitions>
 
-        <TextBox x:Name="edtDestination" Grid.Row="0"
-                 Grid.Column="0"/>
-        <Button Content="..." Grid.Row="0"
-                 Grid.Column="1"/>
+        <TextBlock Text="S3 Path" Grid.Row="0" Grid.Column="0"
+                   Margin="0,0,5,0" VerticalAlignment="Center"/>
+
+        <TextBox x:Name="edtDestination" Grid.Row="0" Grid.Column="1"/>
+        <!--<Button Content="..." Grid.Row="0" Grid.Column="2"/>-->
 
       </Grid>
 
-      <StackPanel x:Name="spnlJobParameters" Orientation="Vertical">
-        <TextBlock Text="Job Parameters"/>
+      <!-- S3 Bucket --> <Grid> 
+
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="75"/>
+          <ColumnDefinition Width="*"/>
+          <!-- <ColumnDefinition Width="auto"/> -->
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="Bucket" Grid.Row="0" Grid.Column="0"
+                   Margin="0,0,5,0" VerticalAlignment="Center"/>
+
+        <TextBox x:Name="edtS3Bucket" Grid.Row="0" Grid.Column="1"/>
+        <!--<Button Content="..." Grid.Row="0" Grid.Column="2"/>-->
+
+      </Grid>
+
+
+     <!--Job Params--> <StackPanel x:Name="spnlJobParameters" Orientation="Vertical">
+        <TextBlock Text="Job Parameters" Margin="0,0,0,2"
+                   FontSize="18"/>
+       
         <StackPanel Orientation="Horizontal"
                     Spacing="5" ScrollViewer.HorizontalScrollBarVisibility="Auto">
-          <CheckBox Content="Sync Source to Destination"/>
-          <RadioButton Content="Test1"/>
-          <RadioButton Content="Test2"/>
+          <RadioButton Content="Sync local to S3" x:Name="rbtnSyncUp"/>
+          <RadioButton Content="Sync S3 to local (coming soon)" IsEnabled="false"/>
         </StackPanel>
+       <StackPanel Orientation="Horizontal"
+                  Spacing="5">
+         <CheckBox x:Name="chckbxRecursiveSync" Content="Recursive Sync"/>
+         <CheckBox x:Name="chckbxRunwithProfile" Content="Run Job with Profile"/>
+       </StackPanel>
+       
+      
+       
       </StackPanel>
 
-      <CheckBox x:Name="chkbxJobEnabled" Content="Enable Job (runs when profile runs)"/>
-
+      
+      
     </StackPanel>
 
+    <!-- Cancel and Save Buttons--> <StackPanel Orientation="Horizontal"
+                Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center">
+      
+      <Button Content="Cancel"
+              MinWidth="75" MaxWidth="75" HorizontalContentAlignment="Center" 
+              IsCancel="true" Click="btnCancel_Clicked"/>
+      <Button Content="Save"
+              MinWidth="75" MaxWidth="75" HorizontalContentAlignment="Center"
+              Click="btnSaveJob_ClickedAsync"/>
+
+    </StackPanel>
 
   </Grid>
 

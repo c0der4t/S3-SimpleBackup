@@ -39,17 +39,30 @@
                 SelectedIndex="{Binding #tabstrpNavigation.SelectedIndex}">
 
       <TabItem x:Name="tabOutput">
-        <StackPanel>
-          <TextBlock Text="Welcome to S3-SimpleBackup!"/>
+        
+        
+        <Grid>
 
-          <StackPanel x:Name="spnlActiveJobs" >
+          <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+          </Grid.RowDefinitions>
 
-          </StackPanel>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
 
-          <TextBox x:Name="edtLogOutput" TextWrapping="Wrap"
-                   AcceptsReturn="True"/>
-
-        </StackPanel>
+          <TextBlock Text="Simple S3-Backup" 
+                     Grid.Row="0" Grid.Column="0" Margin="0,-10,0,10"
+                     FontSize="22"/>
+          <TextBox x:Name="edtLogOutput" TextWrapping="WrapWithOverflow"
+                   AcceptsReturn="True" AcceptsTab="true" IsReadOnly="True"
+                   ScrollViewer.HorizontalScrollBarVisibility="Hidden" 
+                   ScrollViewer.VerticalScrollBarVisibility="Visible"
+                   Grid.Row="1" Grid.Column="0"/>
+          
+        </Grid>
+        
       </TabItem>
 
       <TabItem x:Name="tabJobs">
@@ -61,21 +74,86 @@
 
           <StackPanel x:Name="spnlJobsButtons" Orientation="Horizontal" Spacing="5">
             <Button x:Name="btnRunJob" Content="Run Selected Job" Margin="5,5,5,5" Click="btnRunjob_Clicked"/>
-            <Button x:Name="btnRunAllJob" Content="Run All Jobs" Margin="5,5,5,5"/>
-            <Button x:Name="btnNewJob" Content="Setup New Job" Margin="5,5,5,5"/>
+            <Button x:Name="btnRunAllJob" Content="Run All Jobs" Margin="5,5,5,5" Click="btnRunAllJob_Clicked" IsVisible="false"/>
+            <Button x:Name="btnNewJob" Content="New Job" Margin="5,5,5,5" Click="btnNewjob_Clicked"/>
             <Button x:Name="btnEditJob" Content="Edit Job" Margin="5,5,5,5" Click="btnEditjob_Clicked"/>
-            <Button x:Name="btnDeleteJob" Content="Delete Job" Margin="5,5,5,5"/>
+            <Button x:Name="btnDeleteJob" Content="Delete Job" Margin="5,5,5,5" Click="btnDeleteJob_Clicked"/>
           </StackPanel>
 
           <DataGrid x:Name="dbgJobsList" CanUserReorderColumns="False"
-                    IsReadOnly="True" HorizontalScrollBarVisibility="Hidden"
+                    IsReadOnly="True" HorizontalScrollBarVisibility="Auto"
                     />
 
         </StackPanel>
       </TabItem>
 
       <TabItem x:Name="tabSettings">
-        <TextBlock Text="Let's get personal"/>
+       
+        <StackPanel  Orientation="Vertical" Spacing="10" Margin="10,3,10,10">
+          
+          <TextBlock Text="S3 Account Setup" Margin="8,8,8,8"/>
+          <TextBox x:Name="dev_edtS3Host" Watermark="S3 Host/REST Endpoint"/>
+          <TextBox x:Name="dev_edtAccessKeyID" Watermark="Access Key ID" />
+          <TextBox x:Name="dev_edtSecretAccessKey"
+                    Watermark="Secret Access Key"
+                    PasswordChar="*"/>
+          <CheckBox x:Name="chckbxRequireLogin" Content="Encrypt API Key with password (you'll need to unlock the app on every launch)"/>
+          <Button Content="Save Configuration" HorizontalAlignment="Right"/>
+
+          <Grid>
+
+            <Grid.RowDefinitions>
+              <RowDefinition Height="auto"/>
+              <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="Test Configuration" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,5"/>
+            
+            <TextBox x:Name="dev_edtBucketName" Grid.Row="1" Grid.Column="0"
+                     Watermark="Bucket Name"/>
+
+            <StackPanel Orientation="Horizontal" Spacing="10" Grid.Row="1" Grid.Column="1">
+              <Button x:Name="dev_btnTestConnection" Content="Test Connection" Click="btnTestConnection_Clicked"/>
+              <Button x:Name="dev_btnUploadTestFile" Content="Upload Test File" Click="btnUploadTestFile_Clicked"/>
+            </StackPanel>
+
+          </Grid>
+
+          <Grid>
+
+            <Grid.RowDefinitions>
+              <RowDefinition Height="auto"/>
+              <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+
+            <CheckBox x:Name="chckbxEnableEmptyBucketTool" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                      Content="Enable Empty Bucket Tool"
+                      Checked="chckbxEnableEmptyBucketTool_CheckChanged" Unchecked="chckbxEnableEmptyBucketTool_CheckChanged"/>
+
+            <TextBox x:Name="edtEmptyBucketTarget" Grid.Row="1" Grid.Column="0"
+                     Watermark="Bucket Name" IsEnabled="false"/>
+
+            <Button x:Name="btnEmptyBucket" Grid.Row="1" Grid.Column="1"
+                    Content="Empty Bucket" Click="btnEmptyBucket_Clicked" IsEnabled="false"/>
+
+
+          </Grid>
+
+        </StackPanel>
+
+       
+        
+        
       </TabItem>
 
       <TabItem x:Name="tabHelp">
@@ -95,7 +173,7 @@
           </Grid.ColumnDefinitions>
 
           <TextBlock Grid.Row="0"
-                     Text="WARNING!&#x0a;This section is used during development.&#x0a;Do not use touch this section!"/>
+                     Text="WARNING!&#x0a;This section is used during development.&#x0a;Do not use this section!"/>
 
           <StackPanel Orientation="Vertical" Spacing="10" Grid.Row="1" >
 
@@ -103,29 +181,6 @@
             <Button x:Name="dev_btnTestEncryption" Content="Test Encryption" Click="dev_btnTestEncrytion_Clicked"/>
             <Button x:Name="dev_btnTestSourceListing" Content="Test SourceList" Click="dev_btnTestSourceListing_Clicked"/>
             <Panel Background="WhiteSmoke" >
-
-              <StackPanel  Orientation="Vertical" Spacing="10" Margin="10,10,10,10">
-
-                <TextBlock Text="S3 Account Setup" Margin="8,8,8,8"/>
-                <TextBox x:Name="dev_edtS3Host" Watermark="S3 Host/REST Endpoint"/>
-                <TextBox x:Name="dev_edtAccessKeyID" Watermark="Access Key ID" />
-                <TextBox x:Name="dev_edtSecretAccessKey"
-                          Watermark="Secret Access Key"
-                          PasswordChar="*"/>
-                <TextBox x:Name="dev_edtBucketName" Watermark="Bucket Name" />
-                
-                <StackPanel Orientation="Horizontal">
-                  <TextBox x:Name="dev_edtRemoteRoot" Watermark="Remote Root Folder" />
-                  <Button x:Name="dev_btnListRemoteRoot" Click="dev_btnListRemoteRoot_Clicked"/>
-                </StackPanel>
-
-
-                <StackPanel Orientation="Horizontal" Spacing="10">
-                  <Button x:Name="dev_btnTestConnection" Content="Test Connection" Click="dev_btnTestConnection_Clicked"/>
-                  <Button x:Name="dev_btnUploadTestFile" Content="Upload Test File" Click="dev_btnUploadTestFile_Clicked"/>
-                </StackPanel>
-
-              </StackPanel>
 
             </Panel>
 

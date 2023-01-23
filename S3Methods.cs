@@ -15,6 +15,7 @@ using Avalonia.Controls.Shapes;
 using SharedMethods;
 using DataProtection;
 using System.Threading;
+using S3_SimpleBackup.Models;
 
 namespace S3_SimpleBackup
 {
@@ -173,39 +174,133 @@ namespace S3_SimpleBackup
             }
         }
 
-        public void UploadDirectoryToS3(string s3Host, string s3AccessKey, SecureString s3SecureKey, string localDirectory, string s3BucketName)
+        public async Task<bool> UploadToS3(string s3Host, string s3AccessKey, SecureString s3SecureKey, string SourcePath, string s3BucketName, string JobName, bool RecursiveSync, Window parentWindow)
         {
+            Output.WriteToUI($"Starting Job {JobName}", parentWindow);
+
+            Output.WriteToUI($"Indexing Objects in {SourcePath}", parentWindow);
+            List<FileInformation> objectsToUpload = SharedMethods.FileInteraction.FileIndexFromPath(SourcePath, false, RecursiveSync);
+            Output.WriteToUI($"Discovered {objectsToUpload.Count} objects in {SourcePath}", parentWindow);
+
+
             // Create an S3 client
             var s3Client = GenerateS3Client(s3Host,s3AccessKey,s3SecureKey);
 
-            // Get a list of all files in the directory
-            var files = Directory.GetFiles(localDirectory, "*", SearchOption.AllDirectories);
+            int SuccessCount = 0;
+            int FailedCount = 0;
 
-            Debug.WriteLine($"TIME: {DateTime.Now}");
-            int FileCount = 0;
-            // Use Parallel.ForEach to upload each file concurrently
+            Output.WriteToUI($"Uploading {objectsToUpload.Count} objects to bucket {s3BucketName}", parentWindow);
 
-            foreach (var singlefile in files)
+            foreach (var singleObject in objectsToUpload)
             {
-                // Calculate the S3 key for the file (i.e. the file's path within the bucket)
-                var s3Key = singlefile.Replace(localDirectory + System.IO.Path.DirectorySeparatorChar, "");
+                // Create a PutObjectRequest to upload the file / directory
 
-                // Create a PutObjectRequest to upload the file
-                var request = new PutObjectRequest
+                PutObjectRequest request;
+
+                if (singleObject.isDirectory)
                 {
-                    BucketName = s3BucketName,
-                    Key = s3Key,
-                    FilePath = singlefile
-                };
+                    request = new PutObjectRequest
+                    {
+                        BucketName = s3BucketName,
+                        Key = singleObject.ToS3Path(singleObject.FQPath) + "/",
+                        ContentBody = ""
+                    };
 
-                Debug.WriteLine($"Start: {s3Key}\\{singlefile}");
-                // Upload the file to S3
-                s3Client.PutObjectAsync(request);
-                Debug.WriteLine($"Stop: {s3Key}\\{singlefile}");
-                FileCount++;
+                    try
+                    {
+                        await s3Client.PutObjectAsync(request);
+                        Output.WriteToUI($"Uploaded {singleObject.FQPath}", parentWindow);
+                        SuccessCount++;
+                    }
+                    catch (Exception putException)
+                    {
+                        Output.WriteToUI($"Upload Failed {singleObject.FQPath}" +
+                            $" ({putException.Message})", parentWindow);
+                        FailedCount++;
+                    }
+
+                }
+                else
+                {
+                    using (var objectDataStream = new FileStream(singleObject.FQPath, FileMode.Open,FileAccess.Read))
+                    {
+                        Debug.WriteLine($"{singleObject.ObjectName} - {singleObject.FileHash}");
+                        request = new PutObjectRequest
+                        {
+                            BucketName = s3BucketName,
+                            Key = singleObject.ToS3Path(singleObject.FQPath),
+                            InputStream = objectDataStream
+                        };
+
+                        request.Metadata.Add("FileHash", singleObject.FileHash);
+
+                        try
+                        {
+                            await s3Client.PutObjectAsync(request);
+
+                            string SizeTag = (singleObject.FileSize / 1024f) / 1024f > 1 ? $"{(singleObject.FileSize / 1024f) / 1024f}MB" : $"{singleObject.FileSize} bytes";
+                            Output.WriteToUI($"Uploaded [{SizeTag}] {singleObject.FQPath}", parentWindow);
+                            SuccessCount++;
+                        }
+                        catch (Exception putException)
+                        {
+                            Output.WriteToUI($"Upload Failed {singleObject.FQPath}" +
+                                $" ({putException.Message})", parentWindow);
+                            FailedCount++;
+                        }
+                    }
+                }
+                
             };
+            Output.WriteToUI($"Finished Job {JobName}", parentWindow);
+            Output.WriteToUI($"Job Summary - Success [{SuccessCount}] | Failed [{FailedCount}]", parentWindow);
+            return true;
 
-            Debug.WriteLine($"TIME: {DateTime.Now}");
+            
+        }
+
+        public async void DeleteAllObjectsinBucket(string s3Host, string s3AccessKey, SecureString s3SecureKey,string bucketToTarget, Window parentWindow)
+        {
+            try
+            {
+                Output.WriteToUI($"Deleting all objects in bucket {bucketToTarget}", parentWindow);
+
+                // Create an S3 client
+                var config = new AmazonS3Config { ServiceURL = s3Host };
+                var s3Credentials = new BasicAWSCredentials(s3AccessKey, UnProtect.ConvertToInsecureString(s3SecureKey));
+
+                using (AmazonS3Client s3Client = new AmazonS3Client(s3Credentials, config))
+                {
+                    var ListRequest = new ListObjectsV2Request
+                    {
+                        BucketName = bucketToTarget
+                    };
+
+                    ListObjectsV2Response ListofObjects;
+
+                    do
+                    {
+                        ListofObjects = await s3Client.ListObjectsV2Async(ListRequest);
+
+                        foreach (S3Object obj in ListofObjects.S3Objects)
+                        {
+                            Output.WriteToUI($"Deleting Object {obj.Key}", parentWindow);
+                            await s3Client.DeleteObjectAsync(bucketToTarget, obj.Key);
+                        }
+
+                        ListRequest.ContinuationToken = ListofObjects.NextContinuationToken;
+
+                    } while (ListofObjects.IsTruncated);
+                }
+
+                Output.WriteToUI($"Successfully deleted all contents from bucket {bucketToTarget}", parentWindow);
+
+            }
+            catch (Exception deleteException)
+            {
+                Output.WriteToUI($"An error occurred\n:{deleteException}\n\nPlease try again", parentWindow);
+            }
+            
         }
 
     }

@@ -1,0 +1,6 @@
+#This is a Simple S3 profile file
+#Fields starting with # are considered comments
+#Field Format:
+#JobName,LocalPath,S3Path,BucketName,JobParameterString,doRunWithProfile
+Test1,D:\EDS_Retail,,mydevtest,/su /r,false
+D Drive,D:\,,mydevtest,/su /r,true

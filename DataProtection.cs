@@ -7,6 +7,10 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.IO;
+using HarfBuzzSharp;
+using Microsoft.VisualBasic;
+using static System.Net.WebRequestMethods;
+using System.Threading.Tasks.Dataflow;
 
 namespace DataProtection
 {
@@ -73,4 +77,39 @@ namespace DataProtection
 
 
     }
+
+    public partial class Hash
+    {
+        public static string CalculateSHA256Hash_FromFilePath(string PathtoFile)
+        {
+            // Open the file as a stream
+            using (FileStream fileStream = new FileStream(PathtoFile, FileMode.Open, FileAccess.Read))
+            {
+                // Create a new instance of the SHA256CryptoServiceProvider
+                using (SHA256 sha256 = SHA256.Create())
+                {
+                    // Allocate a buffer for reading the file
+                    byte[] buffer = new byte[(1024 * 1024) * 10]; // 1MB buffer
+
+                    int bytesRead;
+                    // Read the file and update the hash
+                    while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        sha256.TransformBlock(buffer, 0, bytesRead, buffer, 0);
+                    }
+
+                    // Finalize the hash
+                    sha256.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
+
+                    // Get the hash as a byte array
+                    byte[] hash = sha256.Hash;
+
+                    // Convert the hash to a hexadecimal string
+                    string hashString = BitConverter.ToString(hash).Replace("-", "").ToLower();
+                    return hashString;
+                }
+            }
+
+        }
+}
 }
