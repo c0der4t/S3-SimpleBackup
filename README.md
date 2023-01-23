@@ -19,7 +19,7 @@ WE ARE WORKING ON A SECURE WAY TO STORE YOUR KEYS
 - Recursive sync is now optional
 - Added ability to empty an entire bucket, with warning systems of course
 - Converted working methods to asynchronous so UI no longer locks up
-- UI output / log not updates live and does not freeze
+- UI output / log now updates live and does not freeze
 - Added memory management to UI output to avoid infinite memory usage as the log grows
 - Cleaned up settings screen
 - Added AppConfig Models
