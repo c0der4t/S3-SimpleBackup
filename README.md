@@ -8,7 +8,7 @@ Although the application can now fully sync files up to an S3 bucket, it is impo
 The app currently does not encrypt API keys at rest in the s3.ini file. Please opt for typing your keys into the UI manually each time you run the app. 
 WE ARE WORKING ON A SECURE WAY TO STORE YOUR KEYS
 
-## 👀 Most release / commit
+## 👀 Recent release / commit
 
  Features added:
 
