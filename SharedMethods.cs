@@ -309,6 +309,35 @@ namespace SharedMethods
             return false;
         }
 
+        public static bool LoadS3Config()
+        {
+            try
+            {
+                if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "s3.ini")))
+                {
+                    string[] S3Info = File.ReadAllLines(Path.Combine(Directory.GetCurrentDirectory(), "s3.ini"));
+
+                    S3Config.EncryptSecretKey = S3Info[3].ToLower() == "true";
+
+                    S3Config.Host = S3Info[0];
+                    S3Config.AccessKey = S3Info[1];
+                    S3Config.SecretKey = S3Info[2];
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+            catch (Exception settingException)
+            {
+                return false;
+            }
+           
+        }
+
     }
 
     public partial class FileInteraction

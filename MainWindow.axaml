@@ -92,9 +92,9 @@
         <StackPanel  Orientation="Vertical" Spacing="10" Margin="10,3,10,10">
           
           <TextBlock Text="S3 Account Setup" Margin="8,8,8,8"/>
-          <TextBox x:Name="dev_edtS3Host" Watermark="S3 Host/REST Endpoint"/>
-          <TextBox x:Name="dev_edtAccessKeyID" Watermark="Access Key ID" />
-          <TextBox x:Name="dev_edtSecretAccessKey"
+          <TextBox x:Name="edtS3Host" Watermark="S3 Host/REST Endpoint"/>
+          <TextBox x:Name="edtAccessKeyID" Watermark="Access Key ID" />
+          <TextBox x:Name="edtSecretAccessKey"
                     Watermark="Secret Access Key"
                     PasswordChar="*"/>
           <CheckBox x:Name="chckbxRequireLogin" Content="Encrypt API Key with password (you'll need to unlock the app on every launch)"/>

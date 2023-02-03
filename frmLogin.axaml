@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="S3_SimpleBackup.Login"
+        Title="Login" x:Name="frmLogin"
+        MinWidth="520" MinHeight="360" MaxWidth="520" MaxHeight="390">
+
+<Grid>
+
+  <Grid.RowDefinitions>
+      <RowDefinition Height="10"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="auto"/>
+      <RowDefinition Height="10"/>
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="10"/>
+      <ColumnDefinition Width="*"/>
+      <ColumnDefinition Width="10"/>
+    </Grid.ColumnDefinitions>
+
+     <Button Content="Save"
+              MinWidth="75" MaxWidth="75" HorizontalContentAlignment="Center"
+              />
+
+
+</Grid>
+
+</Window>

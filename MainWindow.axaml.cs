@@ -27,33 +27,12 @@ namespace S3_SimpleBackup
 
             tabDev.IsVisible = AppConfig.ShowDevWindow;
 
-            //Check if s3 keys exist. If so load them
-            if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "s3.ini")))
+            if (DoInputOutput.LoadS3Config())
             {
-                using (StreamReader devInfo = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), "s3.ini")))
-                {
-                    string currLine = "";
-                    int lineCounter = 0;
-                    while ((currLine = devInfo.ReadLine()) != null)
-                    {
-                        lineCounter += 1;
-
-                        switch (lineCounter)
-                        {
-                            case 1:
-                                dev_edtS3Host.Text = currLine;
-                                break;
-                            case 2:
-                                dev_edtAccessKeyID.Text = currLine;
-                                break;
-                            case 3:
-                                dev_edtSecretAccessKey.Text = currLine;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
+                edtS3Host.Text = S3Config.Host;
+                edtAccessKeyID.Text = S3Config.AccessKey;
+                edtSecretAccessKey.Text = S3Config.SecretKey;
+                chckbxRequireLogin.IsChecked = S3Config.EncryptSecretKey;
             }
 
         }
@@ -61,7 +40,7 @@ namespace S3_SimpleBackup
         private async void btnTestConnection_Clicked(object? sender, RoutedEventArgs args)
         {
             dev_btnTestConnection.Content = "Testing Connection...";
-            string ConnectionSuccess = await s3Methods.Test_BucketConnectionAsync(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), dev_edtBucketName.Text, this);
+            string ConnectionSuccess = await s3Methods.Test_BucketConnectionAsync(edtS3Host.Text, edtAccessKeyID.Text, Protect.ConvertToSecureString(edtSecretAccessKey.Text), dev_edtBucketName.Text, this);
 
             dev_btnTestConnection.Content = "Test Connection";
 
@@ -84,7 +63,7 @@ namespace S3_SimpleBackup
 
             if (outPathStrings != null)
             {
-                UploadSuccess = await s3Methods.Test_UploadTestFile(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), dev_edtBucketName.Text, outPathStrings[0], this);
+                UploadSuccess = await s3Methods.Test_UploadTestFile(edtS3Host.Text, edtAccessKeyID.Text, Protect.ConvertToSecureString(edtSecretAccessKey.Text), dev_edtBucketName.Text, outPathStrings[0], this);
 
             }
 
@@ -115,7 +94,7 @@ namespace S3_SimpleBackup
                 {
                     Output.WriteToUI($"Second confirm received to empty bucket {dev_edtBucketName.Text}", this);
                     
-                   s3Methods.DeleteAllObjectsinBucket(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), dev_edtBucketName.Text,this);
+                   s3Methods.DeleteAllObjectsinBucket(edtS3Host.Text, edtAccessKeyID.Text, Protect.ConvertToSecureString(edtSecretAccessKey.Text), dev_edtBucketName.Text,this);
 
                 }
             }
@@ -169,6 +148,7 @@ namespace S3_SimpleBackup
                     profiles.Add(job.JobProfile);
                 }
             }
+            
             JobManager jobManagerWindow = new JobManager("new", null, profiles);
             await jobManagerWindow.ShowDialog(this);
 
@@ -179,21 +159,23 @@ namespace S3_SimpleBackup
 
         private async void btnEditjob_Clicked(object? sender, RoutedEventArgs args)
         {
-            List<string> profiles = new List<string>();
-            foreach (var job in _Jobs)
+            if (dbgJobsList.SelectedIndex > -1)
             {
-                if (!profiles.Contains(job.JobProfile))
+                List<string> profiles = new List<string>();
+                foreach (var job in _Jobs)
                 {
-                    profiles.Add(job.JobProfile);
+                    if (!profiles.Contains(job.JobProfile))
+                    {
+                        profiles.Add(job.JobProfile);
+                    }
                 }
+                JobManager jobManagerWindow = new JobManager("edit", _Jobs[dbgJobsList.SelectedIndex], profiles);
+                await jobManagerWindow.ShowDialog(this);
+
+                _Jobs.Clear();
+                dbgJobsList.Items = null;
+                LoadJobConfiguration();
             }
-            JobManager jobManagerWindow = new JobManager("edit", _Jobs[dbgJobsList.SelectedIndex],profiles);
-            await jobManagerWindow.ShowDialog(this);
-
-            _Jobs.Clear();
-            dbgJobsList.Items = null;
-            LoadJobConfiguration();
-
         }
 
         private async void btnDeleteJob_Clicked(object? sender, RoutedEventArgs args)
@@ -217,7 +199,7 @@ namespace S3_SimpleBackup
         private async void btnRunjob_Clicked(object? sender, RoutedEventArgs args)
         {
             BackupJobModel Src = dbgJobsList.SelectedItem as BackupJobModel;
-            s3Methods.UploadToS3(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), Src.SourceFileFolder, Src.S3BucketName,Src.JobName,Src.JobParameters.Contains("/r"), this);
+            s3Methods.UploadToS3(edtS3Host.Text, edtAccessKeyID.Text, Protect.ConvertToSecureString(edtSecretAccessKey.Text), Src.SourceFileFolder, Src.S3BucketName,Src.JobName,Src.JobParameters.Contains("/r"), this);
        
         }
 
@@ -226,7 +208,7 @@ namespace S3_SimpleBackup
             foreach (var item in dbgJobsList.Items)
             {
                 BackupJobModel Src = item as BackupJobModel;
-                s3Methods.UploadToS3(dev_edtS3Host.Text, dev_edtAccessKeyID.Text, Protect.ConvertToSecureString(dev_edtSecretAccessKey.Text), Src.SourceFileFolder, Src.S3BucketName, Src.JobName, Src.JobParameters.Contains("/r"), this);
+                s3Methods.UploadToS3(edtS3Host.Text, edtAccessKeyID.Text, Protect.ConvertToSecureString(edtSecretAccessKey.Text), Src.SourceFileFolder, Src.S3BucketName, Src.JobName, Src.JobParameters.Contains("/r"), this);
             }
         }
 
