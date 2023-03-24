@@ -5,13 +5,12 @@
     <RestoreTool Condition=" '$(RestoreTool)' == '' ">NuGet</RestoreTool>
     <ProjectAssetsFile Condition=" '$(ProjectAssetsFile)' == '' ">$(MSBuildThisFileDirectory)project.assets.json</ProjectAssetsFile>
     <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
-    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">C:\Users\monte\.nuget\packages\;C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages</NuGetPackageFolders>
+    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">C:\Users\lab_services_student\.nuget\packages\</NuGetPackageFolders>
     <NuGetProjectStyle Condition=" '$(NuGetProjectStyle)' == '' ">PackageReference</NuGetProjectStyle>
-    <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">6.4.0</NuGetToolVersion>
+    <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">6.5.0</NuGetToolVersion>
   </PropertyGroup>
   <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <SourceRoot Include="C:\Users\monte\.nuget\packages\" />
-    <SourceRoot Include="C:\Program Files (x86)\Microsoft Visual Studio\Shared\NuGetPackages\" />
+    <SourceRoot Include="C:\Users\lab_services_student\.nuget\packages\" />
   </ItemGroup>
   <ImportGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <Import Project="$(NuGetPackageRoot)xamlnamereferencegenerator\1.5.1\buildTransitive\XamlNameReferenceGenerator.props" Condition="Exists('$(NuGetPackageRoot)xamlnamereferencegenerator\1.5.1\buildTransitive\XamlNameReferenceGenerator.props')" />
@@ -20,9 +19,9 @@
     <Import Project="$(NuGetPackageRoot)avalonia\0.10.18\buildTransitive\Avalonia.props" Condition="Exists('$(NuGetPackageRoot)avalonia\0.10.18\buildTransitive\Avalonia.props')" />
   </ImportGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <PkgMicrosoft_CodeAnalysis_Analyzers Condition=" '$(PkgMicrosoft_CodeAnalysis_Analyzers)' == '' ">C:\Users\monte\.nuget\packages\microsoft.codeanalysis.analyzers\2.9.6</PkgMicrosoft_CodeAnalysis_Analyzers>
-    <PkgAWSSDK_Core Condition=" '$(PkgAWSSDK_Core)' == '' ">C:\Users\monte\.nuget\packages\awssdk.core\3.7.103.18</PkgAWSSDK_Core>
-    <PkgAWSSDK_S3 Condition=" '$(PkgAWSSDK_S3)' == '' ">C:\Users\monte\.nuget\packages\awssdk.s3\3.7.101.56</PkgAWSSDK_S3>
-    <PkgAvalonia Condition=" '$(PkgAvalonia)' == '' ">C:\Users\monte\.nuget\packages\avalonia\0.10.18</PkgAvalonia>
+    <PkgMicrosoft_CodeAnalysis_Analyzers Condition=" '$(PkgMicrosoft_CodeAnalysis_Analyzers)' == '' ">C:\Users\lab_services_student\.nuget\packages\microsoft.codeanalysis.analyzers\2.9.6</PkgMicrosoft_CodeAnalysis_Analyzers>
+    <PkgAWSSDK_Core Condition=" '$(PkgAWSSDK_Core)' == '' ">C:\Users\lab_services_student\.nuget\packages\awssdk.core\3.7.103.18</PkgAWSSDK_Core>
+    <PkgAWSSDK_S3 Condition=" '$(PkgAWSSDK_S3)' == '' ">C:\Users\lab_services_student\.nuget\packages\awssdk.s3\3.7.101.56</PkgAWSSDK_S3>
+    <PkgAvalonia Condition=" '$(PkgAvalonia)' == '' ">C:\Users\lab_services_student\.nuget\packages\avalonia\0.10.18</PkgAvalonia>
   </PropertyGroup>
 </Project>

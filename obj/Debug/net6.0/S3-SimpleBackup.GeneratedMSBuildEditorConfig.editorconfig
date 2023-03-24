@@ -12,19 +12,19 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = S3-SimpleBackup
-build_property.ProjectDir = D:\S3-SimpleBackup\
+build_property.ProjectDir = C:\Users\lab_services_student\dev\S3-SimpleBackup\
 
-[D:/S3-SimpleBackup/App.axaml]
+[C:/Users/lab_services_student/dev/S3-SimpleBackup/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[D:/S3-SimpleBackup/CustomMessageBox.axaml]
+[C:/Users/lab_services_student/dev/S3-SimpleBackup/CustomMessageBox.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[D:/S3-SimpleBackup/frmJobManager.axaml]
+[C:/Users/lab_services_student/dev/S3-SimpleBackup/frmJobManager.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[D:/S3-SimpleBackup/frmLogin.axaml]
+[C:/Users/lab_services_student/dev/S3-SimpleBackup/frmLogin.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[D:/S3-SimpleBackup/MainWindow.axaml]
+[C:/Users/lab_services_student/dev/S3-SimpleBackup/MainWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

@@ -27,7 +27,7 @@ namespace S3_SimpleBackup
 
             tabDev.IsVisible = AppConfig.ShowDevWindow;
 
-            if (DoInputOutput.LoadS3Config())
+            if (DoInputOutput.LoadS3Config(this))
             {
                 edtS3Host.Text = S3Config.Host;
                 edtAccessKeyID.Text = S3Config.AccessKey;
@@ -39,19 +39,38 @@ namespace S3_SimpleBackup
 
         private async void btnTestConnection_Clicked(object? sender, RoutedEventArgs args)
         {
-            dev_btnTestConnection.Content = "Testing Connection...";
-            string ConnectionSuccess = await s3Methods.Test_BucketConnectionAsync(edtS3Host.Text, edtAccessKeyID.Text, Protect.ConvertToSecureString(edtSecretAccessKey.Text), dev_edtBucketName.Text, this);
-
-            dev_btnTestConnection.Content = "Test Connection";
-
-            if (!ConnectionSuccess.Contains("Error"))
+            if ((edtS3Host.Text != string.Empty) && (edtAccessKeyID.Text != string.Empty) && (edtSecretAccessKey.Text != string.Empty) && (dev_edtBucketName.Text != string.Empty) )
             {
-                await MessageBox.Show(frmMain, $"Successfully listed objects in bucket: {dev_edtBucketName.Text}", "Connection Verified", MessageBox.MessageBoxButtons.Ok);
+                dev_btnTestConnection.Content = "Testing Connection...";
+                string ConnectionSuccess = await s3Methods.Test_BucketConnectionAsync(edtS3Host.Text, edtAccessKeyID.Text, Protect.ConvertToSecureString(edtSecretAccessKey.Text), dev_edtBucketName.Text, this);
+
+                dev_btnTestConnection.Content = "Test Connection";
+
+                if (!ConnectionSuccess.Contains("Error"))
+                {
+                    await MessageBox.Show(frmMain, $"Successfully listed objects in bucket: {dev_edtBucketName.Text}", "Connection Verified", MessageBox.MessageBoxButtons.Ok);
+                }
+                else
+                {
+                    await MessageBox.Show(frmMain, ConnectionSuccess, "Connection Failed", MessageBox.MessageBoxButtons.Ok);
+                }
             }
-            else
+            
+        }
+
+        private async void btnSaveS3Config_Clicked(object? sender, RoutedEventArgs args) {
+
+             S3Config.Host = edtS3Host.Text;
+             S3Config.AccessKey = edtAccessKeyID.Text;
+             S3Config.SecretKey = edtSecretAccessKey.Text;
+            S3Config.EncryptSecretKey = true;
+            if (chckbxRequireLogin.IsChecked != true)
             {
-                await MessageBox.Show(frmMain, ConnectionSuccess, "Connection Failed", MessageBox.MessageBoxButtons.Ok);
+                S3Config.EncryptSecretKey = false;
             }
+
+            DoInputOutput.WriteS3Config(this);
+
         }
 
         private async void btnUploadTestFile_Clicked(object? sender, RoutedEventArgs args)

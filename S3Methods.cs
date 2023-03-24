@@ -24,9 +24,10 @@ namespace S3_SimpleBackup
 
         public IAmazonS3 GenerateS3Client(string s3Host, string s3AccessKey, SecureString s3SecureKey)
         {
-            var config = new AmazonS3Config { ServiceURL = s3Host };
-            var s3Credentials = new BasicAWSCredentials(s3AccessKey, UnProtect.ConvertToInsecureString(s3SecureKey));
-            return new AmazonS3Client(s3Credentials, config);
+                var config = new AmazonS3Config { ServiceURL = s3Host };
+                var s3Credentials = new BasicAWSCredentials(s3AccessKey, UnProtect.ConvertToInsecureString(s3SecureKey));
+                return new AmazonS3Client(s3Credentials, config);
+            
         }
 
         /// <summary>
@@ -176,70 +177,42 @@ namespace S3_SimpleBackup
 
         public async Task<bool> UploadToS3(string s3Host, string s3AccessKey, SecureString s3SecureKey, string SourcePath, string s3BucketName, string JobName, bool RecursiveSync, Window parentWindow)
         {
-            Output.WriteToUI($"Starting Job {JobName}", parentWindow);
-
-            Output.WriteToUI($"Indexing Objects in {SourcePath}", parentWindow);
-            List<FileInformation> objectsToUpload = SharedMethods.FileInteraction.FileIndexFromPath(SourcePath, false, RecursiveSync);
-            Output.WriteToUI($"Discovered {objectsToUpload.Count} objects in {SourcePath}", parentWindow);
-
-
-            // Create an S3 client
-            var s3Client = GenerateS3Client(s3Host,s3AccessKey,s3SecureKey);
-
-            int SuccessCount = 0;
-            int FailedCount = 0;
-
-            Output.WriteToUI($"Uploading {objectsToUpload.Count} objects to bucket {s3BucketName}", parentWindow);
-
-            foreach (var singleObject in objectsToUpload)
+            try
             {
-                // Create a PutObjectRequest to upload the file / directory
+                Output.WriteToUI($"Starting Job {JobName}", parentWindow);
 
-                PutObjectRequest request;
+                Output.WriteToUI($"Indexing Objects in {SourcePath}", parentWindow);
+                List<FileInformation> objectsToUpload = SharedMethods.FileInteraction.FileIndexFromPath(SourcePath, false, RecursiveSync, parentWindow);
+                Output.WriteToUI($"Discovered {objectsToUpload.Count} objects in {SourcePath}", parentWindow);
 
-                if (singleObject.isDirectory)
+
+                // Create an S3 client
+                var s3Client = GenerateS3Client(s3Host, s3AccessKey, s3SecureKey);
+
+                int SuccessCount = 0;
+                int FailedCount = 0;
+
+                Output.WriteToUI($"Uploading {objectsToUpload.Count} objects to bucket {s3BucketName}", parentWindow);
+
+                foreach (var singleObject in objectsToUpload)
                 {
-                    request = new PutObjectRequest
-                    {
-                        BucketName = s3BucketName,
-                        Key = singleObject.ToS3Path(singleObject.FQPath) + "/",
-                        ContentBody = ""
-                    };
+                    // Create a PutObjectRequest to upload the file / directory
 
-                    try
-                    {
-                        await s3Client.PutObjectAsync(request);
-                        Output.WriteToUI($"Uploaded {singleObject.FQPath}", parentWindow);
-                        SuccessCount++;
-                    }
-                    catch (Exception putException)
-                    {
-                        Output.WriteToUI($"Upload Failed {singleObject.FQPath}" +
-                            $" ({putException.Message})", parentWindow);
-                        FailedCount++;
-                    }
+                    PutObjectRequest request;
 
-                }
-                else
-                {
-                    using (var objectDataStream = new FileStream(singleObject.FQPath, FileMode.Open,FileAccess.Read))
+                    if (singleObject.isDirectory)
                     {
-                        Debug.WriteLine($"{singleObject.ObjectName} - {singleObject.FileHash}");
                         request = new PutObjectRequest
                         {
                             BucketName = s3BucketName,
-                            Key = singleObject.ToS3Path(singleObject.FQPath),
-                            InputStream = objectDataStream
+                            Key = singleObject.ToS3Path(singleObject.FQPath) + "/",
+                            ContentBody = ""
                         };
-
-                        request.Metadata.Add("FileHash", singleObject.FileHash);
 
                         try
                         {
                             await s3Client.PutObjectAsync(request);
-
-                            string SizeTag = (singleObject.FileSize / 1024f) / 1024f > 1 ? $"{(singleObject.FileSize / 1024f) / 1024f}MB" : $"{singleObject.FileSize} bytes";
-                            Output.WriteToUI($"Uploaded [{SizeTag}] {singleObject.FQPath}", parentWindow);
+                            Output.WriteToUI($"Uploaded {singleObject.FQPath}", parentWindow);
                             SuccessCount++;
                         }
                         catch (Exception putException)
@@ -248,13 +221,49 @@ namespace S3_SimpleBackup
                                 $" ({putException.Message})", parentWindow);
                             FailedCount++;
                         }
+
                     }
-                }
-                
-            };
-            Output.WriteToUI($"Finished Job {JobName}", parentWindow);
-            Output.WriteToUI($"Job Summary - Success [{SuccessCount}] | Failed [{FailedCount}]", parentWindow);
-            return true;
+                    else
+                    {
+                        using (var objectDataStream = new FileStream(singleObject.FQPath, FileMode.Open, FileAccess.Read))
+                        {
+                            Debug.WriteLine($"{singleObject.ObjectName} - {singleObject.FileHash}");
+                            request = new PutObjectRequest
+                            {
+                                BucketName = s3BucketName,
+                                Key = singleObject.ToS3Path(singleObject.FQPath),
+                                InputStream = objectDataStream
+                            };
+
+                            request.Metadata.Add("FileHash", singleObject.FileHash);
+
+                            try
+                            {
+                                await s3Client.PutObjectAsync(request);
+
+                                string SizeTag = (singleObject.FileSize / 1024f) / 1024f > 1 ? $"{(singleObject.FileSize / 1024f) / 1024f}MB" : $"{singleObject.FileSize} bytes";
+                                Output.WriteToUI($"Uploaded [{SizeTag}] {singleObject.FQPath}", parentWindow);
+                                SuccessCount++;
+                            }
+                            catch (Exception putException)
+                            {
+                                Output.WriteToUI($"Upload Failed {singleObject.FQPath}" +
+                                    $" ({putException.Message})", parentWindow);
+                                FailedCount++;
+                            }
+                        }
+                    }
+
+                };
+                Output.WriteToUI($"Finished Job {JobName}", parentWindow);
+                Output.WriteToUI($"Job Summary - Success [{SuccessCount}] | Failed [{FailedCount}]", parentWindow);
+                return true;
+            }
+            catch (Exception e)
+            {
+                Output.WriteToUI($"An error occured with the S3 connection:\n{e.Message}",parentWindow);
+                return false;
+            }
 
             
         }

@@ -98,7 +98,7 @@
                     Watermark="Secret Access Key"
                     PasswordChar="*"/>
           <CheckBox x:Name="chckbxRequireLogin" Content="Encrypt API Key with password (you'll need to unlock the app on every launch)"/>
-          <Button Content="Save Configuration" HorizontalAlignment="Right"/>
+          <Button Content="Save Configuration" HorizontalAlignment="Right" Click="btnSaveS3Config_Clicked"/>
 
           <Grid>
 

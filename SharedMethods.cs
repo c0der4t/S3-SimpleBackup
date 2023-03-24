@@ -160,18 +160,18 @@ namespace SharedMethods
         public static async Task<bool> UpdateJobAsync(string OldJobName, BackupJobModel jobInfo, Window parentWindow)
         {
             try
-            { 
-                List <BackupJobModel> newJobsforProfile = new List<BackupJobModel>();
+            {
+                List<BackupJobModel> newJobsforProfile = new List<BackupJobModel>();
                 CreateProfileIfNotExists(jobInfo.JobProfile);
 
                 //Load the profile file, and find the job to update
-                foreach (string currLine in System.IO.File.ReadLines(Path.Combine(AppConfig.ProfileStorageLocation,jobInfo.JobProfile)))
+                foreach (string currLine in System.IO.File.ReadLines(Path.Combine(AppConfig.ProfileStorageLocation, jobInfo.JobProfile)))
                 {
                     BackupJobModel processedJobItem = ParseJobItem(jobInfo.JobProfile, currLine, parentWindow);
 
                     if (processedJobItem != null)
                     {
-                       newJobsforProfile.Add(processedJobItem.JobName != OldJobName ? processedJobItem : jobInfo);
+                        newJobsforProfile.Add(processedJobItem.JobName != OldJobName ? processedJobItem : jobInfo);
                     }
                 }
 
@@ -309,7 +309,7 @@ namespace SharedMethods
             return false;
         }
 
-        public static bool LoadS3Config()
+        public static bool LoadS3Config(Window parentWindow = null)
         {
             try
             {
@@ -323,10 +323,13 @@ namespace SharedMethods
                     S3Config.AccessKey = S3Info[1];
                     S3Config.SecretKey = S3Info[2];
 
+
+                    Output.WriteToUI("Successfully loaded S3 access configuration.", parentWindow);
                     return true;
                 }
                 else
                 {
+                    Output.WriteToUI("Unable to find s3.ini file. S3 access configuration not loaded", parentWindow);
                     return false;
                 }
 
@@ -335,15 +338,40 @@ namespace SharedMethods
             {
                 return false;
             }
-           
+
+        }
+
+        public static bool WriteS3Config(Window parentWindow = null)
+        {
+            try
+            {
+                File.Move(Path.Combine(Directory.GetCurrentDirectory(), "s3.ini"), Path.Combine(Directory.GetCurrentDirectory(), "s3.bak"));
+
+                using (StreamWriter s3ConfigFile = new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), "s3.ini")))
+                {
+                    s3ConfigFile.WriteLine(S3Config.Host);
+                    s3ConfigFile.WriteLine(S3Config.AccessKey);
+                    s3ConfigFile.WriteLine(S3Config.SecretKey);
+                    s3ConfigFile.WriteLine(S3Config.EncryptSecretKey ? "true" : "false");
+                }
+
+                File.Delete(Path.Combine(Directory.GetCurrentDirectory(), "s3.bak"));
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
         }
 
     }
 
+
     public partial class FileInteraction
     {
 
-        public static List<FileInformation> FileIndexFromPath(string pathToSourceObject, bool isDirectory = false, bool RecursiveIndex = false)
+        public static List<FileInformation> FileIndexFromPath(string pathToSourceObject, bool isDirectory = false, bool RecursiveIndex = false, Window parentWindow = null)
         {
             //If directory, and recurse, loop method
             //From list of objects in directory, GetFileInformation for files
@@ -370,6 +398,7 @@ namespace SharedMethods
 
                 foreach (var singleFile in Directory.GetFiles(pathToSourceObject))
                 {
+                    Output.WriteToUI($"Indexed {singleFile}", parentWindow);
                     listFileInformation.Add(GetFileInformation(singleFile));
                 }
 
