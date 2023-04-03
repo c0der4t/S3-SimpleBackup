@@ -373,56 +373,63 @@ namespace SharedMethods
 
         public static List<FileInformation> FileIndexFromPath(string pathToSourceObject, bool isDirectory = false, bool RecursiveIndex = false, Window parentWindow = null)
         {
-            //If directory, and recurse, loop method
-            //From list of objects in directory, GetFileInformation for files
-
-            List<FileInformation> listFileInformation = new List<FileInformation>();
-
-            if (RecursiveIndex)
+            try
             {
-                // TODO: Add check for restricted file access.
+                //If directory, and recurse, loop method
+                //From list of objects in directory, GetFileInformation for files
 
+                List<FileInformation> listFileInformation = new List<FileInformation>();
 
-                foreach (var subDirectory in Directory.GetDirectories(pathToSourceObject))
+                if (RecursiveIndex)
                 {
-                    FileInformation objectInfo = new FileInformation();
-                    objectInfo.isDirectory = true;
-                    objectInfo.ObjectName = subDirectory.Substring(subDirectory.LastIndexOf('\\') + 1);
-                    objectInfo.FQPath = subDirectory;
-                    objectInfo.FileSize = 0;
-                    listFileInformation.Add(objectInfo);
+                    // TODO: Add check for restricted file access.
 
-                    listFileInformation.AddRange(FileIndexFromPath(subDirectory, true, RecursiveIndex));
+
+                    foreach (var subDirectory in Directory.GetDirectories(pathToSourceObject))
+                    {
+                        FileInformation objectInfo = new FileInformation();
+                        objectInfo.isDirectory = true;
+                        objectInfo.ObjectName = subDirectory.Substring(subDirectory.LastIndexOf('\\') + 1);
+                        objectInfo.FQPath = subDirectory;
+                        objectInfo.FileSize = 0;
+                        listFileInformation.Add(objectInfo);
+
+                        listFileInformation.AddRange(FileIndexFromPath(subDirectory, true, RecursiveIndex));
+                    }
+
+
+                    foreach (var singleFile in Directory.GetFiles(pathToSourceObject))
+                    {
+                        Output.WriteToUI($"Indexed {singleFile}", parentWindow);
+                        listFileInformation.Add(GetFileInformation(singleFile));
+                    }
+
+                    return listFileInformation;
+
                 }
-
-
-                foreach (var singleFile in Directory.GetFiles(pathToSourceObject))
+                else
                 {
-                    Output.WriteToUI($"Indexed {singleFile}", parentWindow);
-                    listFileInformation.Add(GetFileInformation(singleFile));
+                    foreach (var subDirectory in Directory.GetDirectories(pathToSourceObject))
+                    {
+                        FileInformation objectInfo = new FileInformation();
+                        objectInfo.isDirectory = true;
+                        objectInfo.ObjectName = subDirectory.Substring(subDirectory.LastIndexOf('\\') + 1);
+                        objectInfo.FQPath = subDirectory;
+                        listFileInformation.Add(objectInfo);
+                    }
+
+                    foreach (var singleFile in Directory.GetFiles(pathToSourceObject))
+                    {
+                        listFileInformation.Add(GetFileInformation(singleFile));
+                    }
+
+                    listFileInformation.Sort((x, y) => x.FileSize.CompareTo(y.FileSize));
+                    return listFileInformation;
                 }
-
-                return listFileInformation;
-
             }
-            else
-            {
-                foreach (var subDirectory in Directory.GetDirectories(pathToSourceObject))
-                {
-                    FileInformation objectInfo = new FileInformation();
-                    objectInfo.isDirectory = true;
-                    objectInfo.ObjectName = subDirectory.Substring(subDirectory.LastIndexOf('\\') + 1);
-                    objectInfo.FQPath = subDirectory;
-                    listFileInformation.Add(objectInfo);
-                }
-
-                foreach (var singleFile in Directory.GetFiles(pathToSourceObject))
-                {
-                    listFileInformation.Add(GetFileInformation(singleFile));
-                }
-
-                listFileInformation.Sort((x, y) => x.FileSize.CompareTo(y.FileSize));
-                return listFileInformation;
+            catch (Exception e)
+            { 
+                throw new Exception($"An error during file indexing:{e.Message}");
             }
         }
 

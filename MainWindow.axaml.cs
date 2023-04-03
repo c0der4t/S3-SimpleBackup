@@ -217,7 +217,11 @@ namespace S3_SimpleBackup
 
         private async void btnRunjob_Clicked(object? sender, RoutedEventArgs args)
         {
+            
             BackupJobModel Src = dbgJobsList.SelectedItem as BackupJobModel;
+
+
+            Output.WriteToUI($"Starting Job {Src.JobName}", this);
             s3Methods.UploadToS3(edtS3Host.Text, edtAccessKeyID.Text, Protect.ConvertToSecureString(edtSecretAccessKey.Text), Src.SourceFileFolder, Src.S3BucketName,Src.JobName,Src.JobParameters.Contains("/r"), this);
        
         }
