@@ -2,4 +2,4 @@ ToDo
 [*] Traverse directories of remote repo
 [] Index the source folder
 []! Index destination / Compare
-[]
+[]Test
