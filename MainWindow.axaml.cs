@@ -113,7 +113,7 @@ namespace S3_SimpleBackup
                 {
                     Output.WriteToUI($"Second confirm received to empty bucket {dev_edtBucketName.Text}", this);
                     
-                   s3Methods.DeleteAllObjectsinBucket(edtS3Host.Text, edtAccessKeyID.Text, Protect.ConvertToSecureString(edtSecretAccessKey.Text), dev_edtBucketName.Text,this);
+                   s3Methods.DeleteAllObjectsinBucket(edtS3Host.Text, edtAccessKeyID.Text, Protect.ConvertToSecureString(edtSecretAccessKey.Text), edtEmptyBucketTarget.Text,this);
 
                 }
             }

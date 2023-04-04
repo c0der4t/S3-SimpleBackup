@@ -2,4 +2,5 @@
 #Fields starting with # are considered comments
 #Field Format:
 #JobName,LocalPath,S3Path,BucketName,JobParameterString,doRunWithProfile
-syncOneDrive,C:\Users\lab_services_student\OneDrive - ADvTECH Ltd,/,varsity,/su /r,true
+syncOneDrive,C:\Users\lab_services_student\Downloads,/,varsity,/su /r,true
+syncDocuments,C:\wamp64,/,varsity,/su /r,true

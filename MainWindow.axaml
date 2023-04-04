@@ -82,7 +82,7 @@
 
           <DataGrid x:Name="dbgJobsList" CanUserReorderColumns="False"
                     IsReadOnly="True" HorizontalScrollBarVisibility="Auto"
-                    />
+                    Padding ="5"/>
 
         </StackPanel>
       </TabItem>
