@@ -371,7 +371,7 @@ namespace SharedMethods
     public partial class FileInteraction
     {
 
-        public static List<FileInformation> FileIndexFromPath(string pathToSourceObject, bool isDirectory = false, bool RecursiveIndex = false, Window parentWindow = null)
+        public async Task<List<FileInformation>> FileIndexFromPath(string pathToSourceObject, bool isDirectory = false, bool RecursiveIndex = false, Window parentWindow = null)
         {
             try
             {
@@ -394,7 +394,7 @@ namespace SharedMethods
                         objectInfo.FileSize = 0;
                         listFileInformation.Add(objectInfo);
 
-                        listFileInformation.AddRange(FileIndexFromPath(subDirectory, true, RecursiveIndex));
+                        listFileInformation.AddRange(await FileIndexFromPath(subDirectory, true, RecursiveIndex));
                     }
 
 

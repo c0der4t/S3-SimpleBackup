@@ -16,6 +16,7 @@ using SharedMethods;
 using DataProtection;
 using System.Threading;
 using S3_SimpleBackup.Models;
+using Avalonia.Controls.Mixins;
 
 namespace S3_SimpleBackup
 {
@@ -24,10 +25,10 @@ namespace S3_SimpleBackup
 
         public IAmazonS3 GenerateS3Client(string s3Host, string s3AccessKey, SecureString s3SecureKey)
         {
-                var config = new AmazonS3Config { ServiceURL = s3Host };
-                var s3Credentials = new BasicAWSCredentials(s3AccessKey, UnProtect.ConvertToInsecureString(s3SecureKey));
-                return new AmazonS3Client(s3Credentials, config);
-            
+            var config = new AmazonS3Config { ServiceURL = s3Host };
+            var s3Credentials = new BasicAWSCredentials(s3AccessKey, UnProtect.ConvertToInsecureString(s3SecureKey));
+            return new AmazonS3Client(s3Credentials, config);
+
         }
 
         /// <summary>
@@ -107,9 +108,9 @@ namespace S3_SimpleBackup
                             Debug.WriteLine("Object - " + obj.Key.Substring(0, obj.Key.IndexOf('/')));
                         }
                     }
-                        
-                   
-                    
+
+
+
                 }
 
                 return true;
@@ -182,7 +183,10 @@ namespace S3_SimpleBackup
                 Output.WriteToUI($"Starting Job {JobName}", parentWindow);
 
                 Output.WriteToUI($"Indexing Objects in {SourcePath}", parentWindow);
-                List<FileInformation> objectsToUpload = SharedMethods.FileInteraction.FileIndexFromPath(SourcePath, false, RecursiveSync, parentWindow);
+
+                //Index all files and folders in the source directory
+                SharedMethods.FileInteraction fileActor = new SharedMethods.FileInteraction();
+                List<FileInformation> objectsToUpload = await fileActor.FileIndexFromPath(SourcePath, false, RecursiveSync, parentWindow);
                 Output.WriteToUI($"Discovered {objectsToUpload.Count} objects in {SourcePath}", parentWindow);
 
 
@@ -225,6 +229,8 @@ namespace S3_SimpleBackup
                     }
                     else
                     {
+                        await ValidateObjectHash(s3Client, s3BucketName, singleObject.ToS3Path(singleObject.FQPath), singleObject.FileHash);
+
                         using (var objectDataStream = new FileStream(singleObject.FQPath, FileMode.Open, FileAccess.Read))
                         {
                             Debug.WriteLine($"{singleObject.ObjectName} - {singleObject.FileHash}");
@@ -241,7 +247,7 @@ namespace S3_SimpleBackup
                             {
                                 await s3Client.PutObjectAsync(request);
 
-                                string SizeTag = (singleObject.FileSize / 1024f) / 1024f > 1 ? $"{(singleObject.FileSize / 1024f) / 1024f}MB" : $"{singleObject.FileSize} bytes";
+                                string SizeTag = (singleObject.FileSize / 1024f) / 1024f > 1 ? $"{Math.Floor((singleObject.FileSize / 1024f) / 1024f)}MB" : $"{singleObject.FileSize} bytes";
                                 Output.WriteToUI($"Uploaded [{SizeTag}] {singleObject.FQPath}", parentWindow);
                                 SuccessCount++;
                             }
@@ -261,14 +267,57 @@ namespace S3_SimpleBackup
             }
             catch (Exception e)
             {
-                Output.WriteToUI($"An error occured with the S3 connection:\n{e.Message}",parentWindow);
+                Output.WriteToUI($"An error occured with the S3 connection:\n{e.Message}", parentWindow);
                 return false;
             }
 
-            
+
         }
 
-        public async void DeleteAllObjectsinBucket(string s3Host, string s3AccessKey, SecureString s3SecureKey,string bucketToTarget, Window parentWindow)
+
+        public async Task<bool> ValidateObjectHash(IAmazonS3 s3Client, string s3BucketName, string keyToObject, string hashToValidateAgainst)
+        {
+            try
+            {
+                //Define a new GetObjectRequest object
+                GetObjectAttributesRequest getRequest;
+
+                //Use the IAmazonS3 object to initialize a new amazon client
+                var _s3Client = s3Client;
+
+                //Build out our request
+                getRequest = new GetObjectAttributesRequest
+                {
+                    BucketName = s3BucketName,
+                    Key = keyToObject
+                };
+
+                GetObjectAttributesResponse response = await _s3Client.GetObjectAttributesAsync(getRequest);
+
+                Debug.WriteLine(response.ToString());
+
+                return true;
+
+            }
+            catch (Amazon.S3.AmazonS3Exception e)
+            {
+                if (!e.Message.Contains("key does not exist"))
+                {
+                    throw new Exception("Error while retrieving file hash for remote object: " + e.Message);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error while retrieving file hash for remote object: " + e.Message);
+            }
+
+        }
+
+        public async void DeleteAllObjectsinBucket(string s3Host, string s3AccessKey, SecureString s3SecureKey, string bucketToTarget, Window parentWindow)
         {
             try
             {
@@ -309,7 +358,7 @@ namespace S3_SimpleBackup
             {
                 Output.WriteToUI($"An error occurred\n:{deleteException}\n\nPlease try again", parentWindow);
             }
-            
+
         }
 
     }

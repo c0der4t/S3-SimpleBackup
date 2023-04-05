@@ -146,7 +146,8 @@ namespace S3_SimpleBackup
             string selectedPath = await folderDialog.ShowAsync(this);
 
             List<FileInformation> sourceFileInfo = new List<FileInformation>();
-            sourceFileInfo = FileInteraction.FileIndexFromPath(selectedPath, true, true);
+            SharedMethods.FileInteraction fileActor = new SharedMethods.FileInteraction();
+            sourceFileInfo = await fileActor.FileIndexFromPath(selectedPath, true, true);
 
             foreach (var item in sourceFileInfo)
             {
