@@ -56,10 +56,6 @@
               "target": "Package",
               "version": "[0.10.18, )"
             },
-            "Avalonia.Diagnostics": {
-              "target": "Package",
-              "version": "[0.10.18, )"
-            },
             "System.Security.Cryptography.ProtectedData": {
               "target": "Package",
               "version": "[7.0.0, )"

@@ -17,6 +17,7 @@ using DataProtection;
 using System.Threading;
 using S3_SimpleBackup.Models;
 using Avalonia.Controls.Mixins;
+using System.Xml;
 
 namespace S3_SimpleBackup
 {
@@ -229,7 +230,7 @@ namespace S3_SimpleBackup
                     }
                     else
                     {
-                        await ValidateObjectHash(s3Client, s3BucketName, singleObject.ToS3Path(singleObject.FQPath), singleObject.FileHash);
+                       // * await ValidateObjectHash(s3Client, s3BucketName, singleObject.ToS3Path(singleObject.FQPath), singleObject.FileHash);
 
                         using (var objectDataStream = new FileStream(singleObject.FQPath, FileMode.Open, FileAccess.Read))
                         {
@@ -280,21 +281,30 @@ namespace S3_SimpleBackup
             try
             {
                 //Define a new GetObjectRequest object
-                GetObjectAttributesRequest getRequest;
+                GetObjectRequest getRequest;
 
                 //Use the IAmazonS3 object to initialize a new amazon client
                 var _s3Client = s3Client;
 
                 //Build out our request
-                getRequest = new GetObjectAttributesRequest
+                getRequest = new GetObjectRequest
                 {
                     BucketName = s3BucketName,
                     Key = keyToObject
                 };
 
-                GetObjectAttributesResponse response = await _s3Client.GetObjectAttributesAsync(getRequest);
+                GetObjectResponse response = await _s3Client.GetObjectAsync(getRequest);
 
-                Debug.WriteLine(response.ToString());
+                //response.Metadata.Keys.
+                Debug.WriteLine(response.Metadata.Keys);
+
+                
+                foreach (var item in response.Metadata.Keys)
+                {
+                    Debug.WriteLine($"{item}");
+                }
+
+                
 
                 return true;
 
