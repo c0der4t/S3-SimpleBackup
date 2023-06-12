@@ -37,6 +37,6 @@ If you like what you see, jump on board and stay in touch. Here are the main way
 
 - [Join me live on Youtube](https://www.youtube.com/@ekronds)
 - Follow the project on [GitHub](https://github.com/c0der4t/EDS_Retail/)
-- [Follow our blog](https://blog.ekronds.co.za/series/eds-retail), we have a series dedicated to EDS Retail (Ensure you subscribe to the newsletter)
+- [Follow our blog](https://blog.ekronds.co.za)(Ensure you subscribe to the newsletter)
 - [Follow me on Twitter](https://twitter.com/EkronMonte) for the bite sized info
 - [Follow me on Polywork](https://www.polywork.com/c0der4t)
