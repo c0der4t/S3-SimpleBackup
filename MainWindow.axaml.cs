@@ -39,7 +39,7 @@ namespace S3_SimpleBackup
 
         private async void btnTestConnection_Clicked(object? sender, RoutedEventArgs args)
         {
-            if ((edtS3Host.Text != string.Empty) && (edtAccessKeyID.Text != string.Empty) && (edtSecretAccessKey.Text != string.Empty) && (dev_edtBucketName.Text != string.Empty) )
+            if ((edtS3Host.Text != string.Empty) && (edtAccessKeyID.Text != string.Empty) && (edtSecretAccessKey.Text != string.Empty) && (dev_edtBucketName.Text != string.Empty))
             {
                 dev_btnTestConnection.Content = "Testing Connection...";
                 string ConnectionSuccess = await s3Methods.Test_BucketConnectionAsync(edtS3Host.Text, edtAccessKeyID.Text, Protect.ConvertToSecureString(edtSecretAccessKey.Text), dev_edtBucketName.Text, this);
@@ -55,19 +55,16 @@ namespace S3_SimpleBackup
                     await MessageBox.Show(frmMain, ConnectionSuccess, "Connection Failed", MessageBox.MessageBoxButtons.Ok);
                 }
             }
-            
+
         }
 
-        private async void btnSaveS3Config_Clicked(object? sender, RoutedEventArgs args) {
+        private async void btnSaveS3Config_Clicked(object? sender, RoutedEventArgs args)
+        {
 
-             S3Config.Host = edtS3Host.Text;
-             S3Config.AccessKey = edtAccessKeyID.Text;
-             S3Config.SecretKey = edtSecretAccessKey.Text;
-            S3Config.EncryptSecretKey = true;
-            if (chckbxRequireLogin.IsChecked != true)
-            {
-                S3Config.EncryptSecretKey = false;
-            }
+            S3Config.Host = edtS3Host.Text;
+            S3Config.AccessKey = edtAccessKeyID.Text;
+            S3Config.SecretKey = edtSecretAccessKey.Text;
+            S3Config.EncryptSecretKey = chckbxRequireLogin.IsChecked == true ? true : false;
 
             DoInputOutput.WriteS3Config(this);
 
@@ -103,7 +100,7 @@ namespace S3_SimpleBackup
 
         private async void btnEmptyBucket_Clicked(object? sender, RoutedEventArgs args)
         {
-            var confirmDelete =  await MessageBox.Show(this, $"This will delete everything in bucket {dev_edtBucketName.Text}\nWould you like to proceed?\n\nTHIS CANNOT BE UNDONE!", "Important Warning!", MessageBox.MessageBoxButtons.YesNo);
+            var confirmDelete = await MessageBox.Show(this, $"This will delete everything in bucket {dev_edtBucketName.Text}\nWould you like to proceed?\n\nTHIS CANNOT BE UNDONE!", "Important Warning!", MessageBox.MessageBoxButtons.YesNo);
             if (confirmDelete == MessageBox.MessageBoxResult.Yes)
             {
                 Output.WriteToUI($"First confirm received to empty bucket {dev_edtBucketName.Text}", this);
@@ -112,8 +109,8 @@ namespace S3_SimpleBackup
                 if (secondConfirmDelete == MessageBox.MessageBoxResult.Yes)
                 {
                     Output.WriteToUI($"Second confirm received to empty bucket {dev_edtBucketName.Text}", this);
-                    
-                   s3Methods.DeleteAllObjectsinBucket(edtS3Host.Text, edtAccessKeyID.Text, Protect.ConvertToSecureString(edtSecretAccessKey.Text), edtEmptyBucketTarget.Text,this);
+
+                    s3Methods.DeleteAllObjectsinBucket(edtS3Host.Text, edtAccessKeyID.Text, Protect.ConvertToSecureString(edtSecretAccessKey.Text), edtEmptyBucketTarget.Text, this);
 
                 }
             }
@@ -167,7 +164,7 @@ namespace S3_SimpleBackup
                     profiles.Add(job.JobProfile);
                 }
             }
-            
+
             JobManager jobManagerWindow = new JobManager("new", null, profiles);
             await jobManagerWindow.ShowDialog(this);
 
@@ -199,31 +196,39 @@ namespace S3_SimpleBackup
 
         private async void btnDeleteJob_Clicked(object? sender, RoutedEventArgs args)
         {
-            BackupJobModel selectedJob = dbgJobsList.SelectedItem as BackupJobModel;
-            var confirmDelete = await MessageBox.Show(this, $"This will delete job {selectedJob.JobName}\nWould you like to proceed?\n\nTHIS CANNOT BE UNDONE!", "Important Warning!", MessageBox.MessageBoxButtons.YesNo);
-
-            if (confirmDelete == MessageBox.MessageBoxResult.Yes)
+            try
             {
-                await DoInputOutput.DeleteJobAsync(_Jobs[dbgJobsList.SelectedIndex], this);
+                BackupJobModel selectedJob = dbgJobsList.SelectedItem as BackupJobModel;
+                var confirmDelete = await MessageBox.Show(this, $"This will delete job {selectedJob.JobName}\nWould you like to proceed?\n\nTHIS CANNOT BE UNDONE!", "Important Warning!", MessageBox.MessageBoxButtons.YesNo);
 
-                _Jobs.Clear();
-                dbgJobsList.Items = null;
-                LoadJobConfiguration();
+                if (confirmDelete == MessageBox.MessageBoxResult.Yes)
+                {
+                    await DoInputOutput.DeleteJobAsync(_Jobs[dbgJobsList.SelectedIndex], this);
+
+                    _Jobs.Clear();
+                    dbgJobsList.Items = null;
+                    LoadJobConfiguration();
+
+                }
 
             }
-            
+            catch (NullReferenceException e)
+            {
+                await MessageBox.Show(this, "Select an item to delete first", "No item selected", MessageBox.MessageBoxButtons.Ok);
+            }
+
         }
 
 
         private async void btnRunjob_Clicked(object? sender, RoutedEventArgs args)
         {
-            
+
             BackupJobModel Src = dbgJobsList.SelectedItem as BackupJobModel;
 
 
             Output.WriteToUI($"Starting Job {Src.JobName}", this);
-            s3Methods.UploadToS3(edtS3Host.Text, edtAccessKeyID.Text, Protect.ConvertToSecureString(edtSecretAccessKey.Text), Src.SourceFileFolder, Src.S3BucketName,Src.JobName,Src.JobParameters.Contains("/r"), this);
-       
+            s3Methods.UploadToS3(edtS3Host.Text, edtAccessKeyID.Text, Protect.ConvertToSecureString(edtSecretAccessKey.Text), Src.SourceFileFolder, Src.S3BucketName, Src.JobName, Src.JobParameters.Contains("/r"), this);
+
         }
 
         private async void btnRunAllJob_Clicked(object? sender, RoutedEventArgs args)
@@ -246,7 +251,7 @@ namespace S3_SimpleBackup
 
 
             #region Load Jobs
-            
+
 
             Output.WriteToUI($"Current Profile Location: {AppConfig.ProfileStorageLocation}", this);
             try

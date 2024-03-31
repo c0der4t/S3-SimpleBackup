@@ -391,9 +391,10 @@ C:\Users\lab_services_student\dev\S3-SimpleBackup\obj\Debug\net6.0\S3-SimpleBack
 C:\Users\lab_services_student\dev\S3-SimpleBackup\obj\Debug\net6.0\S3-SimpleBackup.AssemblyInfoInputs.cache
 C:\Users\lab_services_student\dev\S3-SimpleBackup\obj\Debug\net6.0\S3-SimpleBackup.AssemblyInfo.cs
 C:\Users\lab_services_student\dev\S3-SimpleBackup\obj\Debug\net6.0\S3-SimpleBackup.csproj.CoreCompileInputs.cache
-C:\Users\lab_services_student\dev\S3-SimpleBackup\obj\Debug\net6.0\S3-SimpleBackup.csproj.CopyComplete
 C:\Users\lab_services_student\dev\S3-SimpleBackup\obj\Debug\net6.0\S3-SimpleBackup.dll
 C:\Users\lab_services_student\dev\S3-SimpleBackup\obj\Debug\net6.0\refint\S3-SimpleBackup.dll
 C:\Users\lab_services_student\dev\S3-SimpleBackup\obj\Debug\net6.0\S3-SimpleBackup.pdb
 C:\Users\lab_services_student\dev\S3-SimpleBackup\obj\Debug\net6.0\S3-SimpleBackup.genruntimeconfig.cache
 C:\Users\lab_services_student\dev\S3-SimpleBackup\obj\Debug\net6.0\ref\S3-SimpleBackup.dll
+C:\Users\lab_services_student\dev\S3-SimpleBackup\obj\Debug\net6.0\S3-SimpleBackup.sourcelink.json
+C:\Users\lab_services_student\dev\S3-SimpleBackup\obj\Debug\net6.0\S3-Simpl.CC1141A5.Up2Date

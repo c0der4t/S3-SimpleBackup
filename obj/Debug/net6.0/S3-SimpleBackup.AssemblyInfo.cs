@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("S3-SimpleBackup")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6ae6c4917455470fea8b364b1d81c3bc6a259b80")]
 [assembly: System.Reflection.AssemblyProductAttribute("S3-SimpleBackup")]
 [assembly: System.Reflection.AssemblyTitleAttribute("S3-SimpleBackup")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

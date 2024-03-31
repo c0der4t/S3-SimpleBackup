@@ -345,7 +345,15 @@ namespace SharedMethods
         {
             try
             {
-                File.Move(Path.Combine(Directory.GetCurrentDirectory(), "s3.ini"), Path.Combine(Directory.GetCurrentDirectory(), "s3.bak"));
+                if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "s3.bak"))) {
+                    File.Delete(Path.Combine(Directory.GetCurrentDirectory(), "s3.bak"));
+                }
+
+
+                if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "s3.ini")))
+                {
+                    File.Move(Path.Combine(Directory.GetCurrentDirectory(), "s3.ini"), Path.Combine(Directory.GetCurrentDirectory(), "s3.bak"));
+                }
 
                 using (StreamWriter s3ConfigFile = new StreamWriter(Path.Combine(Directory.GetCurrentDirectory(), "s3.ini")))
                 {
@@ -355,12 +363,16 @@ namespace SharedMethods
                     s3ConfigFile.WriteLine(S3Config.EncryptSecretKey ? "true" : "false");
                 }
 
-                File.Delete(Path.Combine(Directory.GetCurrentDirectory(), "s3.bak"));
+                if (File.Exists(Path.Combine(Directory.GetCurrentDirectory(), "s3.bak")))
+                {
+                    File.Delete(Path.Combine(Directory.GetCurrentDirectory(), "s3.bak"));
+                }
 
                 return true;
             }
             catch (Exception ex)
             {
+                Output.WriteToUI($"Failed to save S3 config : {ex.Message.ToString()}",parentWindow);
                 return false;
             }
         }

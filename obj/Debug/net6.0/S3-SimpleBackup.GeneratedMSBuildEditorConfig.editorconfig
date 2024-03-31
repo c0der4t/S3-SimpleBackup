@@ -13,6 +13,8 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = S3-SimpleBackup
 build_property.ProjectDir = C:\Users\lab_services_student\dev\S3-SimpleBackup\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
 
 [C:/Users/lab_services_student/dev/S3-SimpleBackup/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
