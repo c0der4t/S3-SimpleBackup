@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\lab_services_student\\dev\\S3-SimpleBackup\\S3-SimpleBackup.csproj": {}
+    "C:\\Users\\monte\\Dev\\S3-SimpleBackup\\S3-SimpleBackup.csproj": {}
   },
   "projects": {
-    "C:\\Users\\lab_services_student\\dev\\S3-SimpleBackup\\S3-SimpleBackup.csproj": {
+    "C:\\Users\\monte\\Dev\\S3-SimpleBackup\\S3-SimpleBackup.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\lab_services_student\\dev\\S3-SimpleBackup\\S3-SimpleBackup.csproj",
+        "projectUniqueName": "C:\\Users\\monte\\Dev\\S3-SimpleBackup\\S3-SimpleBackup.csproj",
         "projectName": "S3-SimpleBackup",
-        "projectPath": "C:\\Users\\lab_services_student\\dev\\S3-SimpleBackup\\S3-SimpleBackup.csproj",
-        "packagesPath": "C:\\Users\\lab_services_student\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\lab_services_student\\dev\\S3-SimpleBackup\\obj\\",
+        "projectPath": "C:\\Users\\monte\\Dev\\S3-SimpleBackup\\S3-SimpleBackup.csproj",
+        "packagesPath": "C:\\Users\\monte\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\monte\\Dev\\S3-SimpleBackup\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+          "D:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\lab_services_student\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\monte\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -26,6 +26,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -65,10 +66,6 @@
               "target": "Package",
               "version": "[0.10.18, )"
             },
-            "Avalonia.Diagnostics": {
-              "target": "Package",
-              "version": "[0.10.18, )"
-            },
             "System.Security.Cryptography.ProtectedData": {
               "target": "Package",
               "version": "[7.0.0, )"
@@ -94,7 +91,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.200\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204\\RuntimeIdentifierGraph.json"
         }
       }
     }
